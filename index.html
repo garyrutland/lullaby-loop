@@ -315,7 +315,7 @@
         const titleEl = document.getElementById('app-title');
         const modal = document.getElementById('settings-modal');
 
-        titleEl.addEventListener('touchstart', startPress);
+        titleEl.addEventListener('touchstart', startPress, { passive: false });
         titleEl.addEventListener('mousedown', startPress);
         titleEl.addEventListener('touchend', cancelPress);
         titleEl.addEventListener('mouseup', cancelPress);
@@ -344,9 +344,11 @@
 
         // --- AUDIO ENGINE ---
         function initAudio() {
-            if (audioCtx) return;
             const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (gainNode) return;
+
             const bufferSize = audioCtx.sampleRate * 2;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
@@ -361,14 +363,15 @@
             noiseSource.buffer = buffer;
             noiseSource.loop = true;
             gainNode = audioCtx.createGain();
-            gainNode.gain.value = isMuted ? 0 : 0.5;
+            gainNode.gain.value = isMuted ? 0 : 0.8;
             noiseSource.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            noiseSource.start();
+            noiseSource.start(0);
         }
 
         function playPopSound() {
             if (isMuted || !audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
@@ -478,17 +481,20 @@
         function handleSMove(x, y) { if (dragS) { dragS.x = x - offX; dragS.y = y - offY; } }
         function handleSEnd() { if (dragS) pulse(10); dragS = null; }
 
-        // --- 3. BUBBLES (NEW) ---
+        // --- 3. BUBBLES (UPDATED) ---
         const bc = document.getElementById('canvas-bubbles'); const bctx = bc.getContext('2d');
         let bubbles = [];
         function resizeB() { bc.width = window.innerWidth; bc.height = window.innerHeight; }
 
-        function spawnBubble(bottom = true) {
+        // Spawn function now handles "Force Random Y" to fill screen on load
+        function spawnBubble(forceRandomY = false) {
             bubbles.push({
                 x: Math.random() * bc.width,
-                y: bottom ? bc.height + 50 : Math.random() * bc.height,
-                size: Math.random() * 30 + 20,
-                speed: Math.random() * 1 + 0.5,
+                // If forceRandomY is true, place anywhere on screen (for initial fill)
+                // If false, place at bottom (for new rising bubbles)
+                y: forceRandomY ? Math.random() * bc.height : bc.height + 50,
+                size: Math.random() * 40 + 15, // Range: 15px - 55px
+                speed: Math.random() * 1.5 + 0.5,
                 wobble: Math.random() * Math.PI * 2,
                 color: `hsla(${Math.random() * 40 + 180}, 70%, 70%, 0.3)`
             });
@@ -498,26 +504,24 @@
             if (currentView !== 'bubbles') { requestAnimationFrame(animB); return; }
             bctx.clearRect(0, 0, bc.width, bc.height);
 
-            // Spawn random bubbles periodically if few exist
-            if (bubbles.length < 15 && Math.random() < 0.02) spawnBubble();
-            if (bubbles.length === 0) for (let i = 0; i < 5; i++) spawnBubble(false);
+            // INCREASED DENSITY: Keep ~35 bubbles on screen
+            if (bubbles.length < 35 && Math.random() < 0.1) spawnBubble();
+
+            // INITIAL FILL: If empty, spawn 30 bubbles randomly all over screen
+            if (bubbles.length === 0) {
+                for (let i = 0; i < 30; i++) spawnBubble(true);
+            }
 
             for (let i = 0; i < bubbles.length; i++) {
                 let b = bubbles[i];
                 b.y -= b.speed;
                 b.x += Math.sin(b.y * 0.01 + b.wobble) * 0.5;
 
-                // Draw
-                bctx.beginPath();
-                bctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
-                bctx.fillStyle = b.color;
-                bctx.fill();
-                bctx.strokeStyle = "rgba(255,255,255,0.4)";
-                bctx.lineWidth = 2;
-                bctx.stroke();
+                bctx.beginPath(); bctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                bctx.fillStyle = b.color; bctx.fill();
+                bctx.strokeStyle = "rgba(255,255,255,0.4)"; bctx.lineWidth = 2; bctx.stroke();
 
-                // Remove if off screen
-                if (b.y < -50) { bubbles.splice(i, 1); i--; }
+                if (b.y < -60) { bubbles.splice(i, 1); i--; }
             }
             requestAnimationFrame(animB);
         }
@@ -527,11 +531,7 @@
                 let b = bubbles[i];
                 let dist = Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2);
                 if (dist < b.size + 10) {
-                    bubbles.splice(i, 1);
-                    pulse(10);
-                    playPopSound();
-
-                    // Add pop particle effect (reuse particle system logic briefly)
+                    bubbles.splice(i, 1); pulse(10); playPopSound();
                     bctx.beginPath(); bctx.arc(b.x, b.y, b.size * 1.5, 0, Math.PI * 2);
                     bctx.fillStyle = "rgba(255,255,255,0.8)"; bctx.fill();
                     break;
@@ -545,8 +545,7 @@
         function resizeD() { dc.width = window.innerWidth; dc.height = window.innerHeight; }
         function animD() {
             if (currentView !== 'drawing') { requestAnimationFrame(animD); return; }
-            dctx.fillStyle = 'rgba(5, 5, 5, 0.04)';
-            dctx.fillRect(0, 0, dc.width, dc.height);
+            dctx.fillStyle = 'rgba(5, 5, 5, 0.04)'; dctx.fillRect(0, 0, dc.width, dc.height);
             requestAnimationFrame(animD);
         }
         function handleDStart(x, y) { isDraw = true; dctx.beginPath(); dctx.moveTo(x, y); pulse(5); }
