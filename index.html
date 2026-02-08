@@ -532,7 +532,7 @@
         // --- CONFIG ---
         let sessionMinutes = 90;
         let currentSound = 'deep';
-        let sfxEnabled = true; // NEW STATE
+        let sfxEnabled = true;
         let audioCtx, gainNode, waveLFO;
         let timerInterval;
         let startTime = 0;
@@ -593,7 +593,6 @@
             }
         }
 
-        // NEW: SFX TOGGLE FUNCTION
         function setSFX(val) {
             sfxEnabled = (val === 'on');
             document.querySelectorAll('.sfx-btn').forEach(b => {
@@ -703,16 +702,74 @@
             }
         }
 
-        // --- NEW INTERACTIVE SFX ENGINE ---
+        // --- NEW CONTINUOUS SYNTH ENGINE ---
+        let activeSynth = null;
+        let activeSynthGain = null;
+
+        function startContinuousSynth(type, yRatio) {
+            if (!sfxEnabled || !audioCtx) return;
+            if (activeSynth) stopContinuousSynth();
+
+            activeSynth = audioCtx.createOscillator();
+            activeSynthGain = audioCtx.createGain();
+            activeSynth.connect(activeSynthGain);
+            activeSynthGain.connect(audioCtx.destination);
+
+            const t = audioCtx.currentTime;
+
+            // Map Y position (0-1) to Frequency
+            // 1.0 (Bottom) = Low Pitch, 0.0 (Top) = High Pitch
+            const baseFreq = 200;
+            const maxFreq = 800;
+            const freq = baseFreq + (1 - yRatio) * (maxFreq - baseFreq);
+
+            if (type === 'particles') {
+                activeSynth.type = 'sine';
+                activeSynth.frequency.value = freq;
+                activeSynthGain.gain.setValueAtTime(0, t);
+                activeSynthGain.gain.linearRampToValueAtTime(0.15, t + 0.1);
+            } else if (type === 'liquid') {
+                activeSynth.type = 'triangle';
+                activeSynth.frequency.value = freq * 0.5; // Lower pitch for liquid
+                activeSynthGain.gain.setValueAtTime(0, t);
+                activeSynthGain.gain.linearRampToValueAtTime(0.1, t + 0.2);
+            } else if (type === 'sorting') {
+                activeSynth.type = 'sawtooth'; // Gritty sound for blocks
+                activeSynth.frequency.value = 60; // Low rumble
+                activeSynthGain.gain.setValueAtTime(0, t);
+                activeSynthGain.gain.linearRampToValueAtTime(0.05, t + 0.1);
+            }
+
+            activeSynth.start(t);
+        }
+
+        function updateContinuousSynth(yRatio) {
+            if (!activeSynth) return;
+            const t = audioCtx.currentTime;
+            const baseFreq = 200;
+            const maxFreq = 800;
+
+            // Particles/Liquid Pitch Modulation
+            if (activeSynth.type === 'sine' || activeSynth.type === 'triangle') {
+                const freq = baseFreq + (1 - yRatio) * (maxFreq - baseFreq);
+                activeSynth.frequency.setTargetAtTime(freq, t, 0.1);
+            }
+        }
+
+        function stopContinuousSynth() {
+            if (!activeSynth) return;
+            const t = audioCtx.currentTime;
+            activeSynthGain.gain.cancelScheduledValues(t);
+            activeSynthGain.gain.setTargetAtTime(0, t, 0.1);
+            activeSynth.stop(t + 0.15);
+            activeSynth = null;
+            activeSynthGain = null;
+        }
+
+        // --- DISCRETE SFX ---
         function playSFX(type) {
-            // CHECK 1: Is AudioContext ready?
-            if (!audioCtx) return;
+            if (!audioCtx || !sfxEnabled) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            // CHECK 2: Is SFX enabled by parent?
-            if (!sfxEnabled) return;
-
-            // CHECK 3: Rate limit 'clack' to prevent noise overlap
             if (type === 'clack' && Date.now() - lastSFX < 80) return;
             lastSFX = Date.now();
 
@@ -720,56 +777,28 @@
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
             const t = audioCtx.currentTime;
 
-            if (type === 'chime') {
+            if (type === 'pop') {
                 osc.type = 'sine';
-                const freqs = [523.25, 659.25, 783.99, 1046.50];
-                osc.frequency.value = freqs[Math.floor(Math.random() * freqs.length)];
-                gain.gain.setValueAtTime(0.15, t);
-                gain.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
-                osc.start(t);
-                osc.stop(t + 1.0);
+                osc.frequency.setValueAtTime(400, t);
+                osc.frequency.exponentialRampToValueAtTime(100, t + 0.15);
+                gain.gain.setValueAtTime(0.4, t);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+                osc.start(t); osc.stop(t + 0.15);
             } else if (type === 'clack') {
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(300 + Math.random() * 100, t);
                 osc.frequency.exponentialRampToValueAtTime(100, t + 0.1);
-                gain.gain.setValueAtTime(0.3, t); // Boosted Volume
+                gain.gain.setValueAtTime(0.3, t);
                 gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-                osc.start(t);
-                osc.stop(t + 0.1);
-            } else if (type === 'pop') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, t);
-                osc.frequency.exponentialRampToValueAtTime(100, t + 0.15);
-                gain.gain.setValueAtTime(0.4, t); // Boosted Volume
-                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
-                osc.start(t);
-                osc.stop(t + 0.15);
-            } else if (type === 'swoosh') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(100, t);
-                osc.frequency.linearRampToValueAtTime(50, t + 0.3);
-                gain.gain.setValueAtTime(0.3, t); // Boosted Volume
-                gain.gain.linearRampToValueAtTime(0.001, t + 0.3);
-                osc.start(t);
-                osc.stop(t + 0.3);
-            } else if (type === 'ping') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, t);
-                gain.gain.setValueAtTime(0.15, t);
-                gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
-                osc.start(t);
-                osc.stop(t + 1.5);
+                osc.start(t); osc.stop(t + 0.1);
             }
         }
 
         // --- AUDIO KICKSTART ---
         document.body.addEventListener('touchstart', function () {
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         }, { once: true });
 
         // --- SUNSET TIMER ---
@@ -807,11 +836,7 @@
         function checkIdle() {
             if (!isSessionRunning || isPaused) return;
             let idleTime = Date.now() - lastInteraction;
-
-            if (idleTime > 2000 && Math.random() < 0.05) {
-                ghostInteraction();
-            }
-
+            if (idleTime > 2000 && Math.random() < 0.05) ghostInteraction();
             if (idleTime > 30000) {
                 const games = ['particles', 'sorting', 'bubbles', 'liquid', 'marbles'];
                 let next = games[Math.floor(Math.random() * games.length)];
@@ -824,24 +849,16 @@
         function ghostInteraction() {
             let cx = Math.random() * canvas.width;
             let cy = Math.random() * canvas.height;
-
             if (currentView === 'particles') spawnParticle(cx, cy);
             if (currentView === 'bubbles') spawnBubble();
             if (currentView === 'liquid') spawnLiquid(cx, cy);
-            if (currentView === 'sorting') {
-                if (entities.length > 0) {
-                    let s = entities[Math.floor(Math.random() * entities.length)];
-                    s.dx += (Math.random() - 0.5) * 50;
-                    s.dy += (Math.random() - 0.5) * 50;
-                    s.vAngle += (Math.random() - 0.5) * 0.1;
-                }
+            if (currentView === 'sorting' && entities.length > 0) {
+                let s = entities[Math.floor(Math.random() * entities.length)];
+                s.dx += (Math.random() - 0.5) * 50; s.dy += (Math.random() - 0.5) * 50; s.vAngle += (Math.random() - 0.5) * 0.1;
             }
-            if (currentView === 'marbles') {
-                if (entities.length > 0) {
-                    let m = entities[Math.floor(Math.random() * entities.length)];
-                    m.vx += (Math.random() - 0.5) * 15;
-                    m.vy += (Math.random() - 0.5) * 15;
-                }
+            if (currentView === 'marbles' && entities.length > 0) {
+                let m = entities[Math.floor(Math.random() * entities.length)];
+                m.vx += (Math.random() - 0.5) * 15; m.vy += (Math.random() - 0.5) * 15;
             }
         }
 
@@ -851,7 +868,6 @@
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             const btn = document.getElementById(`btn-${viewName}`);
             if (btn) btn.classList.add('active');
-
             entities = [];
             if (viewName === 'sorting') initSorting();
             if (viewName === 'bubbles') initBubbles();
@@ -863,6 +879,16 @@
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize);
 
+        // END HANDLER FOR CONTINUOUS AUDIO
+        function handleInputEnd() {
+            stopContinuousSynth();
+            if (currentView === 'sorting') handleSEnd();
+        }
+
+        canvas.addEventListener('mouseup', handleInputEnd);
+        canvas.addEventListener('touchend', handleInputEnd);
+        canvas.addEventListener('mouseleave', handleInputEnd);
+
         function handleInput(e, type) {
             if (e.target.closest('.nav-btn') || e.target.closest('#header-area') || e.target.closest('.modal-overlay')) return;
             e.preventDefault();
@@ -871,13 +897,17 @@
 
             lastInteraction = Date.now();
 
+            // Calculate Y ratio for synth (0.0 to 1.0)
+            let yRatio = y / canvas.height;
+
             if (type === 'start') {
-                if (currentView === 'particles') { spawnParticle(x, y); playSFX('chime'); }
+                if (currentView === 'particles') { spawnParticle(x, y); startContinuousSynth('particles', yRatio); }
                 if (currentView === 'sorting') { handleSStart(x, y); }
                 if (currentView === 'bubbles') { handleBStart(x, y); }
-                if (currentView === 'liquid') { spawnLiquid(x, y); playSFX('ping'); }
+                if (currentView === 'liquid') { spawnLiquid(x, y); startContinuousSynth('liquid', yRatio); }
                 if (currentView === 'marbles') { handleMInput(x, y); }
             } else if (type === 'move') {
+                updateContinuousSynth(yRatio);
                 if (currentView === 'particles') spawnParticle(x, y);
                 if (currentView === 'sorting') handleSMove(x, y);
                 if (currentView === 'liquid') spawnLiquid(x, y);
@@ -889,8 +919,6 @@
         canvas.addEventListener('touchstart', e => handleInput(e, 'start'), { passive: false });
         canvas.addEventListener('mousemove', e => handleInput(e, 'move'));
         canvas.addEventListener('touchmove', e => handleInput(e, 'move'), { passive: false });
-        canvas.addEventListener('mouseup', () => { if (currentView === 'sorting') handleSEnd(); });
-        canvas.addEventListener('touchend', () => { if (currentView === 'sorting') handleSEnd(); });
 
         // --- GAME LOGIC ---
 
@@ -918,7 +946,8 @@
                     dragS = s; offX = x - s.x; offY = y - s.y;
                     entities.splice(i, 1); entities.push(dragS);
                     s.targetX = null; s.prevX = x;
-                    pulse(10); playSFX('swoosh');
+                    pulse(10);
+                    startContinuousSynth('sorting', 0.5); // Start drag noise
                     break;
                 }
             }
@@ -999,7 +1028,6 @@
             for (let i = 0; i < entities.length; i++) {
                 let m = entities[i]; m.x += m.vx; m.y += m.vy; m.vx *= 0.98; m.vy *= 0.98;
 
-                // Walls
                 if (m.x < m.r || m.x > canvas.width - m.r) { m.vx *= -0.9; playSFX('clack'); }
                 if (m.y < m.r + 80 || m.y > canvas.height - m.r) { m.vy *= -0.9; playSFX('clack'); }
 
@@ -1035,12 +1063,9 @@
             navBar.style.display = 'flex';
             setTimeout(() => navBar.style.opacity = 1, 100);
             resize();
-
-            // RANDOM START
             const games = ['particles', 'sorting', 'bubbles', 'liquid', 'marbles'];
             const randomGame = games[Math.floor(Math.random() * games.length)];
             switchView(randomGame);
-
             isSessionRunning = true;
             initAudio();
             animate();
