@@ -29,6 +29,11 @@
             -webkit-user-select: none;
         }
 
+        /* Global Box Sizing */
+        * {
+            box-sizing: border-box;
+        }
+
         #app-container {
             position: relative;
             width: 100%;
@@ -151,7 +156,7 @@
             border: 1px solid #333;
             border-radius: 12px;
             padding: 25px;
-            z-index: 4000;
+            z-index: 6000;
             display: none;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
         }
@@ -203,11 +208,15 @@
             font-weight: bold;
             font-size: 14px;
             cursor: pointer;
+            display: block;
+            text-align: center;
+            text-decoration: none;
         }
 
-        .close-btn {
+        .close-btn, .donate-btn {
             background: #444;
             color: white;
+            margin-bottom: 10px;
         }
 
         .pause-btn {
@@ -225,7 +234,7 @@
         .quit-btn {
             background: #c0392b;
             color: white;
-            margin-top: 15px;
+            margin-top: 20px;
             border: 1px solid #e74c3c;
         }
 
@@ -397,27 +406,30 @@
             </div>
 
             <button class="action-btn close-btn" onclick="closeSettings()">Close & Resume</button>
+
+            <a href="https://buymeacoffee.com/gary.rutland" target="_blank" class="action-btn donate-btn">Buy Developer a Coffee</a>
+
             <button class="action-btn quit-btn" onclick="showQuitConfirm()">End Session</button>
         </div>
 
-        <div id="confirm-modal" class="modal-overlay" style="z-index: 4500;">
+        <div id="confirm-modal" class="modal-overlay">
             <h2>End Session?</h2>
             <p>This will stop the audio and return to the Start Screen.</p>
             <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="action-btn close-btn" style="flex:1; margin-top:0;"
+                <button class="action-btn close-btn" style="flex:1; margin-top:0; margin-bottom:0;"
                     onclick="closeQuitConfirm()">Cancel</button>
                 <button class="action-btn quit-btn" style="flex:1; margin-top:0;" onclick="resetApp()">End
                     Session</button>
             </div>
         </div>
 
-        <div id="update-modal" class="modal-overlay" style="z-index: 4600;">
+        <div id="update-modal" class="modal-overlay">
             <h2>Check for Updates?</h2>
             <p style="color: #e67e22;"><strong>Internet Connection Required</strong></p>
             <p>This will reload the app from the server to check for the latest version. Any current settings will be
                 reset.</p>
             <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="action-btn close-btn" style="flex:1; margin-top:0;"
+                <button class="action-btn close-btn" style="flex:1; margin-top:0; margin-bottom:0;"
                     onclick="document.getElementById('update-modal').style.display='none'">Cancel</button>
                 <button class="action-btn update-confirm-btn" style="flex:1; margin-top:0;"
                     onclick="performUpdate()">Update Now</button>
@@ -793,10 +805,11 @@
             }
         }
 
-        // 2. SORTING (Safe Zones Added)
+        // 2. SORTING (Updated with Header Repulsion)
         let dragS = null, offX = 0, offY = 0;
         function initSorting() {
             const cols = ['#5D6D7E', '#A9DFBF', '#F5B7B1', '#D7BDE2', '#F9E79F'];
+            // Spawn lower down (+100px)
             for (let i = 0; i < 15; i++) entities.push({ x: Math.random() * (canvas.width - 100) + 50, y: Math.random() * (canvas.height - 200) + 100, w: Math.random() * 60 + 40, h: Math.random() * 40 + 30, c: cols[Math.floor(Math.random() * cols.length)], dx: Math.random() * 100, dy: Math.random() * 100, scale: 1.0, targetX: null, targetY: null });
         }
         function handleSStart(x, y) {
@@ -815,11 +828,11 @@
                 let s = entities[Math.floor(Math.random() * entities.length)]; s.targetX = Math.random() * (canvas.width - 100) + 50; s.targetY = Math.random() * (canvas.height - 200) + 50; lastInteraction = Date.now();
             }
             entities.forEach(s => {
+                // Ghost Hand
                 if (s.targetX !== null) { s.x += (s.targetX - s.x) * 0.05; s.y += (s.targetY - s.y) * 0.05; if (Math.abs(s.x - s.targetX) < 5) s.targetX = null; }
 
-                // Repel from Header & Footer
+                // Header Repulsion (The "Stuck Block" Fix)
                 if (s.y < 100 && dragS !== s) { s.y += 1; }
-                if (s.y > canvas.height - 100 && dragS !== s) { s.y -= 1; }
 
                 let fx = s.x + Math.sin(Date.now() * 0.001 + s.dx) * 2, fy = s.y + Math.cos(Date.now() * 0.001 + s.dy) * 2;
                 if (dragS === s) { fx = s.x; fy = s.y; s.scale += (1.2 - s.scale) * 0.2; } else { s.scale += (1.0 - s.scale) * 0.2; }
@@ -830,12 +843,36 @@
             });
         }
 
-        // 3. BUBBLES
+        // 3. BUBBLES - AMBIENT MODE (Updated)
         function initBubbles() {
+            // Fill screen immediately
             let maxB = Math.min(80, Math.max(25, Math.floor((canvas.width * canvas.height) / 8000)));
-            for (let i = 0; i < maxB / 2; i++) spawnBubble();
+            for (let i = 0; i < maxB; i++) {
+                entities.push({
+                    type: 'b',
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    s: Math.random() * 40 + 15,
+                    scale: 1.0, // Start full size
+                    sp: Math.random() * 1.5 + 0.5,
+                    w: Math.random() * Math.PI * 2,
+                    c: `hsla(${Math.random() * 40 + 180},70%,70%,0.3)`
+                });
+            }
         }
-        function spawnBubble() { entities.push({ type: 'b', x: Math.random() * canvas.width, y: canvas.height + 50, s: Math.random() * 40 + 15, sp: Math.random() * 1.5 + 0.5, w: Math.random() * Math.PI * 2, c: `hsla(${Math.random() * 40 + 180},70%,70%,0.3)` }); }
+        function spawnBubble() {
+            // Spawn anywhere
+            entities.push({
+                type: 'b',
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height + 50, // Mostly bottom, but varied
+                s: Math.random() * 40 + 15,
+                scale: 0.1, // Start small and grow
+                sp: Math.random() * 1.5 + 0.5,
+                w: Math.random() * Math.PI * 2,
+                c: `hsla(${Math.random() * 40 + 180},70%,70%,0.3)`
+            });
+        }
         function handleBStart(x, y) {
             for (let i = entities.length - 1; i >= 0; i--) {
                 let b = entities[i];
@@ -845,12 +882,19 @@
         function createPop(x, y, c) { for (let i = 0; i < 8; i++) entities.push({ type: 'p', x, y, vx: Math.cos(Math.PI * 2 * i / 8) * 3, vy: Math.sin(Math.PI * 2 * i / 8) * 3, l: 1, c: c.replace('0.3', '0.8') }); }
         function animBubbles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (Math.random() < 0.05) spawnBubble();
+
+            // Maintain density (refill if popping)
+            let maxB = Math.min(80, Math.max(25, Math.floor((canvas.width * canvas.height) / 8000)));
+            if (entities.filter(e => e.type === 'b').length < maxB && Math.random() < 0.05) spawnBubble();
+
             for (let i = 0; i < entities.length; i++) {
                 let e = entities[i];
                 if (e.type === 'b') {
+                    // Grow in logic
+                    if (e.scale < 1.0) e.scale += 0.05;
+
                     e.y -= e.sp; e.x += Math.sin(e.y * 0.01 + e.w) * 0.5;
-                    ctx.beginPath(); ctx.arc(e.x, e.y, e.s, 0, Math.PI * 2); ctx.fillStyle = e.c; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 2; ctx.stroke();
+                    ctx.beginPath(); ctx.arc(e.x, e.y, e.s * e.scale, 0, Math.PI * 2); ctx.fillStyle = e.c; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 2; ctx.stroke();
                     if (e.y < -60) { entities.splice(i, 1); i--; }
                 } else {
                     e.l -= 0.04; e.x += e.vx; e.y += e.vy;
@@ -869,7 +913,7 @@
             let t = Date.now() * 0.002; spawnLiquid(canvas.width / 2 + Math.sin(t) * (canvas.width / 3), canvas.height / 2 + Math.cos(t * 1.3) * (canvas.height / 4));
         }
 
-        // 5. MARBLES (Safe Zones Added)
+        // 5. MARBLES (Updated with Ceiling)
         function initMarbles() {
             for (let i = 0; i < 15; i++) entities.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - .5) * 2, vy: (Math.random() - .5) * 2, r: Math.random() * 15 + 15, c: `hsl(${Math.random() * 360},60%,60%)` });
         }
@@ -884,12 +928,12 @@
             for (let i = 0; i < entities.length; i++) {
                 let m = entities[i]; m.x += m.vx; m.y += m.vy; m.vx *= 0.98; m.vy *= 0.98;
 
-                // Walls (Ceiling 80px, Floor 100px from bottom)
+                // Walls (Ceiling at 80px to avoid Header)
                 if (m.x < m.r || m.x > canvas.width - m.r) m.vx *= -0.9;
-                if (m.y < m.r + 80 || m.y > canvas.height - 100 - m.r) m.vy *= -0.9;
+                if (m.y < m.r + 80 || m.y > canvas.height - m.r) m.vy *= -0.9;
 
                 if (m.x < m.r) m.x = m.r; if (m.x > canvas.width - m.r) m.x = canvas.width - m.r;
-                if (m.y < m.r + 80) m.y = m.r + 80; if (m.y > canvas.height - 100 - m.r) m.y = canvas.height - 100 - m.r;
+                if (m.y < m.r + 80) m.y = m.r + 80; if (m.y > canvas.height - m.r) m.y = canvas.height - m.r;
 
                 for (let j = i + 1; j < entities.length; j++) {
                     let m2 = entities[j], dx = m2.x - m.x, dy = m2.y - m.y, d = Math.sqrt(dx * dx + dy * dy), minD = m.r + m2.r;
@@ -919,9 +963,7 @@
             navBar.style.display = 'flex';
             setTimeout(() => navBar.style.opacity = 1, 100);
             resize();
-            const views = ['particles', 'sorting', 'bubbles', 'liquid', 'marbles'];
-            const randomStart = views[Math.floor(Math.random() * views.length)];
-            switchView(randomStart);
+            switchView('particles'); // Default Start
             isSessionRunning = true;
             initAudio();
             animate();
