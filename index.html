@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Lullaby Loop: Complete</title>
+    <style>
+        /* --- GLOBAL STYLES --- */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #050505;
+            color: white;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Sunset Overlay (Dimmer) */
+        #sunset-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(30, 15, 0, 0.95);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 800;
+            transition: opacity 1s linear;
+        }
+
+        /* --- NAVIGATION BAR --- */
+        #nav-bar {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 900;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #888;
+            transition: fill 0.3s;
+        }
+
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.15) translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-btn.active svg {
+            fill: white;
+        }
+
+        /* --- VIEWS --- */
+        .view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Breathe Logic */
+        #view-breathe {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #view-breathe.active {
+            display: flex;
+        }
+
+        .breathing-circle {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #81C784 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: breathe 8s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.2;
+            }
+
+            50% {
+                transform: scale(3.5);
+                opacity: 0.5;
+            }
+        }
+
+        /* --- HEADER & SETTINGS --- */
+        #header-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #app-title {
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #444;
+            text-transform: uppercase;
+            padding: 20px;
+        }
+
+        /* Settings Modal */
+        #settings-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .setting-row {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            display: block;
+            color: #888;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .time-btn {
+            background: #333;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-right: 5px;
+            font-size: 14px;
+        }
+
+        .time-btn.selected {
+            background: #4a90e2;
+        }
+
+        .close-btn {
+            width: 100%;
+            padding: 10px;
+            background: #333;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        /* Start Overlay */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app-container">
+        <div id="sunset-overlay"></div>
+
+        <div id="header-area">
+            <div id="app-title">Lullaby Loop</div>
+        </div>
+
+        <div id="settings-modal">
+            <div class="setting-row">
+                <span class="setting-label">Session Duration</span>
+                <button class="time-btn" onclick="setDuration(15)">15m</button>
+                <button class="time-btn" onclick="setDuration(30)">30m</button>
+                <button class="time-btn" onclick="setDuration(60)">60m</button>
+                <button class="time-btn selected" onclick="setDuration(90)">90m</button>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">Audio</span>
+                <button id="mute-btn" class="time-btn" style="width:100%" onclick="toggleMute()">Sound: ON</button>
+            </div>
+            <button class="close-btn" onclick="closeSettings()">Close & Save</button>
+        </div>
+
+        <div id="start-screen">
+            <h1 style="font-weight: 300; color: #888; font-size: 24px;">Lullaby Loop</h1>
+            <p style="color: #444; margin-top: 10px;">Tap to Begin</p>
+        </div>
+
+        <div id="nav-bar" style="display:none; opacity: 0; transition: opacity 2s;">
+            <div class="nav-btn active" onclick="switchView('particles')">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+            </div>
+            <div class="nav-btn" onclick="switchView('sorting')">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 3H11V11H3V3ZM13 3H21V11H13V3ZM3 13H11V21H3V13ZM13 13H21V21H13V13Z" />
+                </svg>
+            </div>
+            <div class="nav-btn" onclick="switchView('bubbles')">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" />
+                </svg>
+            </div>
+            <div class="nav-btn" onclick="switchView('drawing')">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M7 17.01V21H11.01L18.73 13.29L14.73 9.29L7 17.01ZM20.41 11.61C20.63 11.39 20.63 11.04 20.41 10.82L17.17 7.58C16.95 7.36 16.6 7.36 16.38 7.58L15.3 8.66L19.3 12.66L20.41 11.61Z" />
+                </svg>
+            </div>
+            <div class="nav-btn" onclick="switchView('breathe')">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12,2C12,2 4,8 4,14C4,18.42 7.58,22 12,22C16.42,22 20,18.42 20,14C20,8 12,2 12,2M12,20C8.69,20 6,17.31 6,14C6,10 12,4.5 12,4.5C12,4.5 18,10 18,14C18,17.31 15.31,20 12,20Z" />
+                </svg>
+            </div>
+        </div>
+
+        <div id="view-particles" class="view active"><canvas id="canvas-particles"></canvas></div>
+        <div id="view-sorting" class="view"><canvas id="canvas-sorting"></canvas></div>
+        <div id="view-bubbles" class="view"><canvas id="canvas-bubbles"></canvas></div>
+        <div id="view-drawing" class="view"><canvas id="canvas-drawing"></canvas></div>
+        <div id="view-breathe" class="view">
+            <div class="breathing-circle"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIG & STATE ---
+        let sessionMinutes = 90;
+        let isMuted = false;
+        let audioCtx, gainNode, startTime, timerInterval;
+        let currentView = 'particles';
+
+        // --- SETTINGS LOGIC ---
+        let pressTimer;
+        const titleEl = document.getElementById('app-title');
+        const modal = document.getElementById('settings-modal');
+
+        titleEl.addEventListener('touchstart', startPress);
+        titleEl.addEventListener('mousedown', startPress);
+        titleEl.addEventListener('touchend', cancelPress);
+        titleEl.addEventListener('mouseup', cancelPress);
+
+        function startPress() { pressTimer = setTimeout(() => { modal.style.display = 'block'; }, 3000); }
+        function cancelPress() { clearTimeout(pressTimer); }
+
+        function setDuration(mins) {
+            sessionMinutes = mins;
+            document.querySelectorAll('.time-btn').forEach(b => {
+                b.classList.remove('selected');
+                if (b.innerText.includes(mins)) b.classList.add('selected');
+            });
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('mute-btn').innerText = isMuted ? "Sound: OFF" : "Sound: ON";
+            if (gainNode) gainNode.gain.value = isMuted ? 0 : 0.5;
+        }
+
+        function closeSettings() {
+            modal.style.display = 'none';
+            if (startTime) startTimer();
+        }
+
+        // --- AUDIO ENGINE ---
+        function initAudio() {
+            if (audioCtx) return;
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            let lastOut = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                lastOut = (lastOut + (0.02 * white)) / 1.02;
+                data[i] = lastOut * 3.5;
+            }
+            const noiseSource = audioCtx.createBufferSource();
+            noiseSource.buffer = buffer;
+            noiseSource.loop = true;
+            gainNode = audioCtx.createGain();
+            gainNode.gain.value = isMuted ? 0 : 0.5;
+            noiseSource.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            noiseSource.start();
+        }
+
+        function playPopSound() {
+            if (isMuted || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        // --- SUNSET TIMER ---
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            startTime = Date.now();
+            const overlay = document.getElementById('sunset-overlay');
+            const totalSeconds = sessionMinutes * 60;
+
+            timerInterval = setInterval(() => {
+                const elapsed = (Date.now() - startTime) / 1000;
+                let progress = elapsed / totalSeconds;
+                if (progress > 1) progress = 1;
+
+                if (progress > 0.5) {
+                    const fade = (progress - 0.5) * 2;
+                    overlay.style.opacity = fade * 0.98;
+                    if (!isMuted && gainNode) gainNode.gain.value = 0.5 * (1 - fade);
+                }
+            }, 1000);
+        }
+
+        // --- VIEW MANAGEMENT ---
+        function switchView(viewName) {
+            currentView = viewName;
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + viewName).classList.add('active');
+
+            const indices = { 'particles': 0, 'sorting': 1, 'bubbles': 2, 'drawing': 3, 'breathe': 4 };
+            document.querySelectorAll('.nav-btn')[indices[viewName]].classList.add('active');
+        }
+
+        // --- INPUT HANDLING ---
+        function pulse(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+        window.addEventListener('resize', () => { resizeP(); resizeS(); resizeB(); resizeD(); });
+
+        ['mousedown', 'touchstart'].forEach(evt => window.addEventListener(evt, e => {
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            if (currentView === 'sorting') handleSStart(x, y);
+            if (currentView === 'bubbles') handleBStart(x, y);
+            if (currentView === 'drawing') handleDStart(x, y);
+        }));
+        ['mousemove', 'touchmove'].forEach(evt => window.addEventListener(evt, e => {
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            if (currentView === 'particles') handlePMove(x, y);
+            if (currentView === 'sorting') handleSMove(x, y);
+            if (currentView === 'drawing') handleDMove(x, y);
+        }));
+        ['mouseup', 'touchend'].forEach(evt => window.addEventListener(evt, e => {
+            if (currentView === 'sorting') handleSEnd();
+            if (currentView === 'drawing') handleDEnd();
+        }));
+
+        // --- 1. PARTICLES ---
+        const pc = document.getElementById('canvas-particles'); const pctx = pc.getContext('2d');
+        let parts = [];
+        function resizeP() { pc.width = window.innerWidth; pc.height = window.innerHeight; }
+        function handlePMove(x, y) { parts.push({ x, y, vx: (Math.random() - .5) * 2, vy: (Math.random() - .5) * 2, life: 1, hue: Math.random() * 60 + 200 }); }
+        function animP() {
+            if (currentView !== 'particles') { requestAnimationFrame(animP); return; }
+            pctx.fillStyle = 'rgba(5,5,5,0.2)'; pctx.fillRect(0, 0, pc.width, pc.height);
+            for (let i = 0; i < parts.length; i++) {
+                let p = parts[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.01;
+                if (p.life > 0) { pctx.beginPath(); pctx.arc(p.x, p.y, Math.random() * 15 + 5, 0, Math.PI * 2); pctx.fillStyle = `hsla(${p.hue},80%,60%,${p.life})`; pctx.fill(); }
+                else { parts.splice(i, 1); i--; }
+            }
+            requestAnimationFrame(animP);
+        }
+
+        // --- 2. SORTING ---
+        const sc = document.getElementById('canvas-sorting'); const sctx = sc.getContext('2d');
+        let stones = [], dragS = null, offX = 0, offY = 0;
+        function resizeS() { sc.width = window.innerWidth; sc.height = window.innerHeight; if (!stones.length) initS(); }
+        function initS() {
+            const cols = ['#5D6D7E', '#A9DFBF', '#F5B7B1', '#D7BDE2', '#F9E79F'];
+            for (let i = 0; i < 12; i++) stones.push({ x: Math.random() * (sc.width - 100) + 50, y: Math.random() * (sc.height - 200) + 50, w: Math.random() * 60 + 40, h: Math.random() * 40 + 30, c: cols[Math.floor(Math.random() * cols.length)] });
+        }
+        function animS() {
+            if (currentView !== 'sorting') { requestAnimationFrame(animS); return; }
+            sctx.clearRect(0, 0, sc.width, sc.height);
+            stones.forEach(s => { sctx.fillStyle = s.c; sctx.beginPath(); sctx.roundRect(s.x - s.w / 2, s.y - s.h / 2, s.w, s.h, 15); sctx.fill(); });
+            requestAnimationFrame(animS);
+        }
+        function handleSStart(x, y) {
+            for (let i = stones.length - 1; i >= 0; i--) {
+                let s = stones[i];
+                if (x > s.x - s.w / 2 && x < s.x + s.w / 2 && y > s.y - s.h / 2 && y < s.y + s.h / 2) {
+                    dragS = s; offX = x - s.x; offY = y - s.y; stones.splice(i, 1); stones.push(dragS); pulse(10); break;
+                }
+            }
+        }
+        function handleSMove(x, y) { if (dragS) { dragS.x = x - offX; dragS.y = y - offY; } }
+        function handleSEnd() { if (dragS) pulse(10); dragS = null; }
+
+        // --- 3. BUBBLES (NEW) ---
+        const bc = document.getElementById('canvas-bubbles'); const bctx = bc.getContext('2d');
+        let bubbles = [];
+        function resizeB() { bc.width = window.innerWidth; bc.height = window.innerHeight; }
+
+        function spawnBubble(bottom = true) {
+            bubbles.push({
+                x: Math.random() * bc.width,
+                y: bottom ? bc.height + 50 : Math.random() * bc.height,
+                size: Math.random() * 30 + 20,
+                speed: Math.random() * 1 + 0.5,
+                wobble: Math.random() * Math.PI * 2,
+                color: `hsla(${Math.random() * 40 + 180}, 70%, 70%, 0.3)`
+            });
+        }
+
+        function animB() {
+            if (currentView !== 'bubbles') { requestAnimationFrame(animB); return; }
+            bctx.clearRect(0, 0, bc.width, bc.height);
+
+            // Spawn random bubbles periodically if few exist
+            if (bubbles.length < 15 && Math.random() < 0.02) spawnBubble();
+            if (bubbles.length === 0) for (let i = 0; i < 5; i++) spawnBubble(false);
+
+            for (let i = 0; i < bubbles.length; i++) {
+                let b = bubbles[i];
+                b.y -= b.speed;
+                b.x += Math.sin(b.y * 0.01 + b.wobble) * 0.5;
+
+                // Draw
+                bctx.beginPath();
+                bctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                bctx.fillStyle = b.color;
+                bctx.fill();
+                bctx.strokeStyle = "rgba(255,255,255,0.4)";
+                bctx.lineWidth = 2;
+                bctx.stroke();
+
+                // Remove if off screen
+                if (b.y < -50) { bubbles.splice(i, 1); i--; }
+            }
+            requestAnimationFrame(animB);
+        }
+
+        function handleBStart(x, y) {
+            for (let i = bubbles.length - 1; i >= 0; i--) {
+                let b = bubbles[i];
+                let dist = Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2);
+                if (dist < b.size + 10) {
+                    bubbles.splice(i, 1);
+                    pulse(10);
+                    playPopSound();
+
+                    // Add pop particle effect (reuse particle system logic briefly)
+                    bctx.beginPath(); bctx.arc(b.x, b.y, b.size * 1.5, 0, Math.PI * 2);
+                    bctx.fillStyle = "rgba(255,255,255,0.8)"; bctx.fill();
+                    break;
+                }
+            }
+        }
+
+        // --- 4. DRAWING ---
+        const dc = document.getElementById('canvas-drawing'); const dctx = dc.getContext('2d');
+        let isDraw = false;
+        function resizeD() { dc.width = window.innerWidth; dc.height = window.innerHeight; }
+        function animD() {
+            if (currentView !== 'drawing') { requestAnimationFrame(animD); return; }
+            dctx.fillStyle = 'rgba(5, 5, 5, 0.04)';
+            dctx.fillRect(0, 0, dc.width, dc.height);
+            requestAnimationFrame(animD);
+        }
+        function handleDStart(x, y) { isDraw = true; dctx.beginPath(); dctx.moveTo(x, y); pulse(5); }
+        function handleDMove(x, y) {
+            if (!isDraw) return;
+            dctx.lineWidth = 15; dctx.lineCap = 'round'; dctx.strokeStyle = `hsl(${Date.now() % 360},70%,60%)`;
+            dctx.shadowBlur = 15; dctx.shadowColor = dctx.strokeStyle;
+            dctx.lineTo(x, y); dctx.stroke(); dctx.beginPath(); dctx.moveTo(x, y);
+        }
+        function handleDEnd() { isDraw = false; }
+
+        // --- BOOT ---
+        document.getElementById('start-screen').addEventListener('click', function () {
+            this.style.opacity = 0;
+            setTimeout(() => this.style.display = 'none', 1000);
+            const nav = document.getElementById('nav-bar');
+            nav.style.display = 'flex';
+            setTimeout(() => nav.style.opacity = 1, 100);
+
+            resizeP(); resizeS(); resizeB(); resizeD();
+            initAudio();
+            animP(); animS(); animB(); animD();
+            startTimer();
+        });
+    </script>
+</body>
+
+</html>
