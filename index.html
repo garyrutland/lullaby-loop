@@ -3,10 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>Lullaby Loop: V9</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Lullaby Loop: Complete</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <style>
         /* --- GLOBAL STYLES --- */
         body,
@@ -30,7 +34,7 @@
             height: 100%;
         }
 
-        /* Sunset Overlay (Dimmer) */
+        /* Sunset Overlay */
         #sunset-overlay {
             position: absolute;
             top: 0;
@@ -109,7 +113,6 @@
             height: 100%;
         }
 
-        /* Breathe Logic */
         #view-breathe {
             display: none;
             flex-direction: column;
@@ -144,7 +147,7 @@
             }
         }
 
-        /* --- HEADER & SETTINGS --- */
+        /* --- HEADER --- */
         #header-area {
             position: absolute;
             top: 0;
@@ -165,20 +168,33 @@
             padding: 20px;
         }
 
-        /* Settings Modal */
-        #settings-modal {
+        /* --- MODALS (Shared Styles) --- */
+        .modal-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 300px;
+            width: 340px;
             background: #1a1a1a;
             border: 1px solid #333;
             border-radius: 12px;
             padding: 20px;
             z-index: 2000;
             display: none;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Settings Modal Specifics */
+        #timer-display {
+            text-align: center;
+            color: #4a90e2;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+            font-weight: bold;
         }
 
         .setting-row {
@@ -192,31 +208,70 @@
             font-size: 14px;
         }
 
-        .time-btn {
+        .opt-btn {
             background: #333;
             border: none;
             color: white;
             padding: 8px 12px;
             border-radius: 6px;
-            margin-right: 5px;
-            font-size: 14px;
+            margin-right: 4px;
+            font-size: 13px;
+            margin-bottom: 5px;
         }
 
-        .time-btn.selected {
+        .opt-btn.selected {
             background: #4a90e2;
         }
 
-        .close-btn {
+        .action-btn {
             width: 100%;
-            padding: 10px;
-            background: #333;
+            padding: 12px;
             border: none;
-            color: white;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-top: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
         }
 
-        /* Start Overlay */
+        .close-btn {
+            background: #444;
+            color: white;
+        }
+
+        .pause-btn {
+            background: #d35400;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .resume-btn {
+            background: #27ae60;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        /* Instructions Modal Specifics */
+        #instructions-modal h2 {
+            font-size: 18px;
+            color: white;
+            margin-top: 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        #instructions-modal p {
+            font-size: 14px;
+            color: #aaa;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        #instructions-modal strong {
+            color: #ddd;
+        }
+
+        /* --- START SCREEN --- */
         #start-screen {
             position: absolute;
             top: 0;
@@ -230,6 +285,80 @@
             justify-content: center;
             align-items: center;
         }
+
+        /* Info Button on Start Screen */
+        #info-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #444;
+            color: #666;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: monospace;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .picker-section {
+            margin: 20px 0;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .picker-label {
+            color: #555;
+            font-size: 11px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .start-opt-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .start-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #888;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            min-width: 60px;
+        }
+
+        .start-btn.selected {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.4);
+        }
+
+        #begin-btn {
+            margin-top: 30px;
+            padding: 15px 50px;
+            background: white;
+            color: black;
+            border-radius: 30px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            transition: transform 0.1s;
+        }
+
+        #begin-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 
@@ -242,24 +371,76 @@
             <div id="app-title">Lullaby Loop</div>
         </div>
 
-        <div id="settings-modal">
-            <div class="setting-row">
-                <span class="setting-label">Session Duration</span>
-                <button class="time-btn" onclick="setDuration(15)">15m</button>
-                <button class="time-btn" onclick="setDuration(30)">30m</button>
-                <button class="time-btn" onclick="setDuration(60)">60m</button>
-                <button class="time-btn selected" onclick="setDuration(90)">90m</button>
+        <div id="settings-modal" class="modal-overlay">
+            <div id="timer-display">Not Started</div>
+
+            <button id="pause-btn" class="action-btn pause-btn" onclick="togglePause()">Pause Session</button>
+
+            <div class="setting-row" style="margin-top: 20px;">
+                <span class="setting-label">Timer</span>
+                <button class="opt-btn time-btn" data-time="15" onclick="changeDuration(15)">15m</button>
+                <button class="opt-btn time-btn" data-time="30" onclick="changeDuration(30)">30m</button>
+                <button class="opt-btn time-btn" data-time="60" onclick="changeDuration(60)">60m</button>
+                <button class="opt-btn time-btn selected" data-time="90" onclick="changeDuration(90)">90m</button>
+                <button class="opt-btn time-btn" data-time="120" onclick="changeDuration(120)">120m</button>
             </div>
             <div class="setting-row">
-                <span class="setting-label">Audio</span>
-                <button id="mute-btn" class="time-btn" style="width:100%" onclick="toggleMute()">Sound: ON</button>
+                <span class="setting-label">Soundscape</span>
+                <button class="opt-btn sound-btn selected" data-sound="deep" onclick="changeSound('deep')">Deep</button>
+                <button class="opt-btn sound-btn" data-sound="rain" onclick="changeSound('rain')">Rain</button>
+                <button class="opt-btn sound-btn" data-sound="waves" onclick="changeSound('waves')">Waves</button>
+                <button class="opt-btn sound-btn" data-sound="off" onclick="changeSound('off')">OFF</button>
             </div>
-            <button class="close-btn" onclick="closeSettings()">Close & Save</button>
+            <button class="action-btn close-btn" onclick="closeSettings()">Close & Resume</button>
+        </div>
+
+        <div id="instructions-modal" class="modal-overlay">
+            <h2>Parent Guide</h2>
+            <p><strong>1. The Goal:</strong> A low-stimulation environment to help wind down. No scores, no levels, just
+                flow.</p>
+            <p><strong>2. Hidden Menu:</strong> Long-press the "Lullaby Loop" title at the top for 3 seconds to access
+                Settings (Timer, Sound, Pause).</p>
+            <p><strong>3. Sunset Timer:</strong> The screen will slowly dim and the audio will fade out automatically
+                over the selected duration.</p>
+            <p><strong>4. Tips:</strong> Use "Guided Access" (iOS) or "App Pinning" (Android) to keep your child inside
+                the app.</p>
+            <button class="action-btn close-btn"
+                onclick="document.getElementById('instructions-modal').style.display='none'">Got it</button>
         </div>
 
         <div id="start-screen">
-            <h1 style="font-weight: 300; color: #888; font-size: 24px;">Lullaby Loop</h1>
-            <p style="color: #444; margin-top: 10px;">Tap to Begin</p>
+            <div id="info-btn" onclick="document.getElementById('instructions-modal').style.display='block'">?</div>
+
+            <h1 style="font-weight: 300; color: #aaa; font-size: 24px; letter-spacing: 3px; margin-bottom: 20px;">
+                LULLABY LOOP</h1>
+
+            <div class="picker-section">
+                <p class="picker-label">Duration</p>
+                <div class="start-opt-row">
+                    <button class="start-btn time-btn" data-time="15" onclick="changeDuration(15)">15m</button>
+                    <button class="start-btn time-btn" data-time="30" onclick="changeDuration(30)">30m</button>
+                    <button class="start-btn time-btn" data-time="60" onclick="changeDuration(60)">60m</button>
+                </div>
+                <div class="start-opt-row">
+                    <button class="start-btn time-btn selected" data-time="90" onclick="changeDuration(90)">90m</button>
+                    <button class="start-btn time-btn" data-time="120" onclick="changeDuration(120)">120m</button>
+                </div>
+            </div>
+
+            <div class="picker-section">
+                <p class="picker-label">Atmosphere</p>
+                <div class="start-opt-row">
+                    <button class="start-btn sound-btn selected" data-sound="deep"
+                        onclick="changeSound('deep')">Deep</button>
+                    <button class="start-btn sound-btn" data-sound="rain" onclick="changeSound('rain')">Rain</button>
+                </div>
+                <div class="start-opt-row">
+                    <button class="start-btn sound-btn" data-sound="waves" onclick="changeSound('waves')">Waves</button>
+                    <button class="start-btn sound-btn" data-sound="off" onclick="changeSound('off')">Silent</button>
+                </div>
+            </div>
+
+            <div id="begin-btn">BEGIN SESSION</div>
         </div>
 
         <div id="nav-bar" style="display:none; opacity: 0; transition: opacity 2s;">
@@ -306,15 +487,23 @@
     <script>
         // --- CONFIG & STATE ---
         let sessionMinutes = 90;
-        let isMuted = false;
-        let audioCtx, gainNode, startTime, timerInterval;
+        let currentSound = 'deep';
+        let audioCtx, gainNode, waveLFO;
+        let timerInterval;
+        let startTime = 0;
+        let elapsedSaved = 0; // Time tracked when paused
+        let isPaused = false;
+        let isSessionRunning = false;
         let currentView = 'particles';
 
-        // --- SETTINGS LOGIC ---
-        let pressTimer;
+        // --- UI REFS ---
         const titleEl = document.getElementById('app-title');
         const modal = document.getElementById('settings-modal');
+        const timerDisplay = document.getElementById('timer-display');
+        const pauseBtn = document.getElementById('pause-btn');
 
+        // --- PARENT SETTINGS LOGIC ---
+        let pressTimer;
         titleEl.addEventListener('touchstart', startPress, { passive: false });
         titleEl.addEventListener('mousedown', startPress);
         titleEl.addEventListener('touchend', cancelPress);
@@ -323,54 +512,127 @@
         function startPress() { pressTimer = setTimeout(() => { modal.style.display = 'block'; }, 3000); }
         function cancelPress() { clearTimeout(pressTimer); }
 
-        function setDuration(mins) {
+        function changeDuration(mins) {
             sessionMinutes = mins;
             document.querySelectorAll('.time-btn').forEach(b => {
                 b.classList.remove('selected');
-                if (b.innerText.includes(mins)) b.classList.add('selected');
+                if (b.getAttribute('data-time') == mins) b.classList.add('selected');
             });
         }
 
-        function toggleMute() {
-            isMuted = !isMuted;
-            document.getElementById('mute-btn').innerText = isMuted ? "Sound: OFF" : "Sound: ON";
-            if (gainNode) gainNode.gain.value = isMuted ? 0 : 0.5;
+        function changeSound(type) {
+            currentSound = type;
+            document.querySelectorAll('.sound-btn').forEach(b => {
+                b.classList.remove('selected');
+                if (b.getAttribute('data-sound') === type) b.classList.add('selected');
+            });
+            if (isSessionRunning && !isPaused && audioCtx) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                generateSoundBuffer(type);
+            }
+        }
+
+        // --- PAUSE LOGIC ---
+        function togglePause() {
+            if (!isSessionRunning) return;
+
+            isPaused = !isPaused;
+
+            if (isPaused) {
+                // PAUSING
+                clearInterval(timerInterval);
+                elapsedSaved += Date.now() - startTime;
+                if (audioCtx) audioCtx.suspend();
+                pauseBtn.innerText = "Resume Session";
+                pauseBtn.className = "action-btn resume-btn";
+                timerDisplay.innerText += " (PAUSED)";
+            } else {
+                // RESUMING
+                startTime = Date.now();
+                startTimer(false); // Restart timer but don't reset elapsed
+                if (audioCtx) audioCtx.resume();
+                pauseBtn.innerText = "Pause Session";
+                pauseBtn.className = "action-btn pause-btn";
+            }
         }
 
         function closeSettings() {
             modal.style.display = 'none';
-            if (startTime) startTimer();
         }
 
         // --- AUDIO ENGINE ---
+        let noiseSource;
+
         function initAudio() {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if (!audioCtx) audioCtx = new AudioContext();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            if (gainNode) return;
+
+            if (!gainNode) {
+                gainNode = audioCtx.createGain();
+                gainNode.connect(audioCtx.destination);
+            }
+            generateSoundBuffer(currentSound);
+        }
+
+        function generateSoundBuffer(type) {
+            if (noiseSource) { try { noiseSource.stop(); } catch (e) { } }
+            if (waveLFO) { try { waveLFO.stop(); } catch (e) { } }
+
+            if (type === 'off') {
+                gainNode.gain.value = 0;
+                return;
+            } else {
+                gainNode.gain.value = 0.8;
+            }
 
             const bufferSize = audioCtx.sampleRate * 2;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
 
-            let lastOut = 0;
-            for (let i = 0; i < bufferSize; i++) {
-                const white = Math.random() * 2 - 1;
-                lastOut = (lastOut + (0.02 * white)) / 1.02;
-                data[i] = lastOut * 3.5;
+            if (type === 'deep' || type === 'waves') {
+                let lastOut = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    lastOut = (lastOut + (0.02 * white)) / 1.02;
+                    data[i] = lastOut * 3.5;
+                }
+            } else if (type === 'rain') {
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+                    b6 = white * 0.115926;
+                }
             }
-            const noiseSource = audioCtx.createBufferSource();
+
+            noiseSource = audioCtx.createBufferSource();
             noiseSource.buffer = buffer;
             noiseSource.loop = true;
-            gainNode = audioCtx.createGain();
-            gainNode.gain.value = isMuted ? 0 : 0.8;
             noiseSource.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
             noiseSource.start(0);
+
+            if (type === 'waves') {
+                noiseSource.disconnect();
+                const waveNode = audioCtx.createGain();
+                waveNode.gain.value = 0.5;
+                noiseSource.connect(waveNode);
+                waveNode.connect(gainNode);
+                waveLFO = audioCtx.createOscillator();
+                waveLFO.type = 'sine';
+                waveLFO.frequency.value = 0.1;
+                waveLFO.connect(waveNode.gain);
+                waveLFO.start();
+            }
         }
 
         function playPopSound() {
-            if (isMuted || !audioCtx) return;
+            if (currentSound === 'off' || !audioCtx) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -386,21 +648,35 @@
         }
 
         // --- SUNSET TIMER ---
-        function startTimer() {
+        function startTimer(reset = true) {
             if (timerInterval) clearInterval(timerInterval);
-            startTime = Date.now();
+
+            if (reset) {
+                startTime = Date.now();
+                elapsedSaved = 0;
+            }
+
             const overlay = document.getElementById('sunset-overlay');
             const totalSeconds = sessionMinutes * 60;
 
             timerInterval = setInterval(() => {
-                const elapsed = (Date.now() - startTime) / 1000;
-                let progress = elapsed / totalSeconds;
+                // Calculate total elapsed including any paused duration
+                const currentSessionElapsed = Math.floor((Date.now() - startTime) + elapsedSaved) / 1000;
+
+                let progress = currentSessionElapsed / totalSeconds;
                 if (progress > 1) progress = 1;
+
+                // UPDATE TIMER UI
+                let remaining = totalSeconds - currentSessionElapsed;
+                if (remaining < 0) remaining = 0;
+                let rMin = Math.floor(remaining / 60);
+                let rSec = Math.floor(remaining % 60);
+                timerDisplay.innerText = `Time Left: ${rMin}m ${rSec < 10 ? '0' : ''}${rSec}s`;
 
                 if (progress > 0.5) {
                     const fade = (progress - 0.5) * 2;
                     overlay.style.opacity = fade * 0.98;
-                    if (!isMuted && gainNode) gainNode.gain.value = 0.5 * (1 - fade);
+                    if (currentSound !== 'off' && gainNode) gainNode.gain.value = 0.8 * (1 - fade);
                 }
             }, 1000);
         }
@@ -411,16 +687,13 @@
             document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + viewName).classList.add('active');
-
             const indices = { 'particles': 0, 'sorting': 1, 'bubbles': 2, 'drawing': 3, 'breathe': 4 };
             document.querySelectorAll('.nav-btn')[indices[viewName]].classList.add('active');
         }
 
         // --- INPUT HANDLING ---
         function pulse(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
-
         window.addEventListener('resize', () => { resizeP(); resizeS(); resizeB(); resizeD(); });
-
         ['mousedown', 'touchstart'].forEach(evt => window.addEventListener(evt, e => {
             const x = e.touches ? e.touches[0].clientX : e.clientX;
             const y = e.touches ? e.touches[0].clientY : e.clientY;
@@ -481,59 +754,37 @@
         function handleSMove(x, y) { if (dragS) { dragS.x = x - offX; dragS.y = y - offY; } }
         function handleSEnd() { if (dragS) pulse(10); dragS = null; }
 
-        // --- 3. BUBBLES (UPDATED) ---
+        // --- 3. BUBBLES ---
         const bc = document.getElementById('canvas-bubbles'); const bctx = bc.getContext('2d');
         let bubbles = [];
         function resizeB() { bc.width = window.innerWidth; bc.height = window.innerHeight; }
-
-        // Spawn function now handles "Force Random Y" to fill screen on load
         function spawnBubble(forceRandomY = false) {
             bubbles.push({
                 x: Math.random() * bc.width,
-                // If forceRandomY is true, place anywhere on screen (for initial fill)
-                // If false, place at bottom (for new rising bubbles)
                 y: forceRandomY ? Math.random() * bc.height : bc.height + 50,
-                size: Math.random() * 40 + 15, // Range: 15px - 55px
-                speed: Math.random() * 1.5 + 0.5,
-                wobble: Math.random() * Math.PI * 2,
-                color: `hsla(${Math.random() * 40 + 180}, 70%, 70%, 0.3)`
+                size: Math.random() * 40 + 15, speed: Math.random() * 1.5 + 0.5,
+                wobble: Math.random() * Math.PI * 2, color: `hsla(${Math.random() * 40 + 180}, 70%, 70%, 0.3)`
             });
         }
-
         function animB() {
             if (currentView !== 'bubbles') { requestAnimationFrame(animB); return; }
             bctx.clearRect(0, 0, bc.width, bc.height);
-
-            // INCREASED DENSITY: Keep ~35 bubbles on screen
             if (bubbles.length < 35 && Math.random() < 0.1) spawnBubble();
-
-            // INITIAL FILL: If empty, spawn 30 bubbles randomly all over screen
-            if (bubbles.length === 0) {
-                for (let i = 0; i < 30; i++) spawnBubble(true);
-            }
-
+            if (bubbles.length === 0) for (let i = 0; i < 30; i++) spawnBubble(true);
             for (let i = 0; i < bubbles.length; i++) {
-                let b = bubbles[i];
-                b.y -= b.speed;
-                b.x += Math.sin(b.y * 0.01 + b.wobble) * 0.5;
-
-                bctx.beginPath(); bctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
-                bctx.fillStyle = b.color; bctx.fill();
+                let b = bubbles[i]; b.y -= b.speed; b.x += Math.sin(b.y * 0.01 + b.wobble) * 0.5;
+                bctx.beginPath(); bctx.arc(b.x, b.y, b.size, 0, Math.PI * 2); bctx.fillStyle = b.color; bctx.fill();
                 bctx.strokeStyle = "rgba(255,255,255,0.4)"; bctx.lineWidth = 2; bctx.stroke();
-
                 if (b.y < -60) { bubbles.splice(i, 1); i--; }
             }
             requestAnimationFrame(animB);
         }
-
         function handleBStart(x, y) {
             for (let i = bubbles.length - 1; i >= 0; i--) {
                 let b = bubbles[i];
-                let dist = Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2);
-                if (dist < b.size + 10) {
+                if (Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2) < b.size + 10) {
                     bubbles.splice(i, 1); pulse(10); playPopSound();
-                    bctx.beginPath(); bctx.arc(b.x, b.y, b.size * 1.5, 0, Math.PI * 2);
-                    bctx.fillStyle = "rgba(255,255,255,0.8)"; bctx.fill();
+                    bctx.beginPath(); bctx.arc(b.x, b.y, b.size * 1.5, 0, Math.PI * 2); bctx.fillStyle = "rgba(255,255,255,0.8)"; bctx.fill();
                     break;
                 }
             }
@@ -558,9 +809,9 @@
         function handleDEnd() { isDraw = false; }
 
         // --- BOOT ---
-        document.getElementById('start-screen').addEventListener('click', function () {
-            this.style.opacity = 0;
-            setTimeout(() => this.style.display = 'none', 1000);
+        document.getElementById('begin-btn').addEventListener('click', function () {
+            isSessionRunning = true;
+            document.getElementById('start-screen').style.display = 'none';
             const nav = document.getElementById('nav-bar');
             nav.style.display = 'flex';
             setTimeout(() => nav.style.opacity = 1, 100);
@@ -568,7 +819,7 @@
             resizeP(); resizeS(); resizeB(); resizeD();
             initAudio();
             animP(); animS(); animB(); animD();
-            startTimer();
+            startTimer(true);
         });
     </script>
 </body>
