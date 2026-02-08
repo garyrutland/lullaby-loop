@@ -4,14 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Lullaby Loop</title>
-
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Lullaby Loop">
+
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
 
     <style>
         /* --- GLOBAL STYLES --- */
@@ -52,15 +51,19 @@
 
         /* --- NAVIGATION BAR --- */
         #nav-bar {
-            position: absolute;
+            /* Changed to FIXED to prevent scrolling off-screen */
+            position: fixed;
             bottom: 30px;
             left: 0;
             width: 100%;
             display: flex;
             justify-content: center;
             gap: 20px;
-            z-index: 900;
+            z-index: 2000;
+            /* Increased Z-Index */
             padding-bottom: env(safe-area-inset-bottom);
+            pointer-events: auto;
+            /* Ensure clicks register */
         }
 
         .nav-btn {
@@ -75,6 +78,8 @@
             transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(8px);
+            /* Disable game touch actions on buttons */
+            touch-action: manipulation;
         }
 
         .nav-btn svg {
@@ -82,6 +87,7 @@
             height: 24px;
             fill: #888;
             transition: fill 0.3s;
+            pointer-events: none;
         }
 
         .nav-btn.active {
@@ -117,15 +123,16 @@
 
         /* --- HEADER --- */
         #header-area {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 80px;
-            z-index: 1000;
+            z-index: 2000;
             display: flex;
             justify-content: center;
             align-items: center;
+            pointer-events: auto;
         }
 
         #app-title {
@@ -135,11 +142,12 @@
             text-transform: uppercase;
             padding: 20px;
             cursor: pointer;
+            user-select: none;
         }
 
         /* --- MODALS --- */
         .modal-overlay {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -149,7 +157,7 @@
             border: 1px solid #333;
             border-radius: 12px;
             padding: 25px;
-            z-index: 2000;
+            z-index: 3000;
             display: none;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
         }
@@ -255,13 +263,13 @@
 
         /* --- START SCREEN --- */
         #start-screen {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: #050505;
-            z-index: 1500;
+            z-index: 2500;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -479,30 +487,30 @@
         </div>
 
         <div id="nav-bar" style="display:none; opacity: 0; transition: opacity 2s;">
-            <div class="nav-btn active" onclick="switchView('particles')">
+            <div class="nav-btn active" onclick="switchView('particles')" ontouchstart="switchView('particles')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
                 </svg>
             </div>
-            <div class="nav-btn" onclick="switchView('sorting')">
+            <div class="nav-btn" onclick="switchView('sorting')" ontouchstart="switchView('sorting')">
                 <svg viewBox="0 0 24 24">
                     <path d="M3 3H11V11H3V3ZM13 3H21V11H13V3ZM3 13H11V21H3V13ZM13 13H21V21H13V13Z" />
                 </svg>
             </div>
-            <div class="nav-btn" onclick="switchView('bubbles')">
+            <div class="nav-btn" onclick="switchView('bubbles')" ontouchstart="switchView('bubbles')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" />
                 </svg>
             </div>
-            <div class="nav-btn" onclick="switchView('liquid')">
+            <div class="nav-btn" onclick="switchView('liquid')" ontouchstart="switchView('liquid')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12,2c-5.33,4.55-8,8.48-8,11.8c0,4.98,3.8,8.2,8,8.2s8-3.22,8-8.2C20,10.48,17.33,6.55,12,2z M12,20c-3.35,0-6-2.57-6-6.2c0-2.34,1.95-5.44,6-9.14c4.05,3.7,6,6.79,6,9.14C18,17.43,15.35,20,12,20z" />
                 </svg>
             </div>
-            <div class="nav-btn" onclick="switchView('marbles')">
+            <div class="nav-btn" onclick="switchView('marbles')" ontouchstart="switchView('marbles')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-5 10c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm10 0c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm-5 7c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
@@ -767,6 +775,9 @@
         function pulse(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
         window.addEventListener('resize', () => { resizeP(); resizeS(); resizeB(); resizeL(); resizeM(); });
         ['mousedown', 'touchstart'].forEach(evt => window.addEventListener(evt, e => {
+            // FIX: Ignore UI elements
+            if (e.target.closest('.nav-btn') || e.target.closest('#header-area') || e.target.closest('.modal-overlay')) return;
+
             const x = e.touches ? e.touches[0].clientX : e.clientX;
             const y = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -774,16 +785,19 @@
             if (currentView === 'bubbles') handleBStart(x, y);
             if (currentView === 'liquid') handleLStart(x, y);
             if (currentView === 'marbles') handleMInput(x, y);
-        }));
+        }, { passive: false }));
+
         ['mousemove', 'touchmove'].forEach(evt => window.addEventListener(evt, e => {
+            if (e.target.closest('.nav-btn') || e.target.closest('#header-area') || e.target.closest('.modal-overlay')) return;
+
             const x = e.touches ? e.touches[0].clientX : e.clientX;
             const y = e.touches ? e.touches[0].clientY : e.clientY;
             if (currentView === 'particles') handlePMove(x, y);
             if (currentView === 'sorting') handleSMove(x, y);
-            if (currentView === 'drawing') handleDMove(x, y); // Removed/Replaced? No, this is liquid now.
             if (currentView === 'liquid') handleLMove(x, y);
             if (currentView === 'marbles') handleMInput(x, y);
-        }));
+        }, { passive: false }));
+
         ['mouseup', 'touchend'].forEach(evt => window.addEventListener(evt, e => {
             if (currentView === 'sorting') handleSEnd();
             if (currentView === 'liquid') handleLEnd();
@@ -814,114 +828,57 @@
         const sc = document.getElementById('canvas-sorting'); const sctx = sc.getContext('2d');
         let stones = [], dragS = null, offX = 0, offY = 0;
         let lastInteractionTime = Date.now();
-
         function resizeS() { sc.width = window.innerWidth; sc.height = window.innerHeight; if (!stones.length) initS(); }
-
         function initS() {
             const cols = ['#5D6D7E', '#A9DFBF', '#F5B7B1', '#D7BDE2', '#F9E79F'];
-            const area = sc.width * sc.height;
-            const count = Math.min(Math.max(Math.floor(area / 35000), 10), 30);
+            const count = Math.min(Math.max(Math.floor((sc.width * sc.height) / 35000), 10), 30);
             for (let i = 0; i < count; i++) spawnStone(cols);
         }
-
         function spawnStone(cols) {
-            if (!cols) cols = ['#5D6D7E', '#A9DFBF', '#F5B7B1', '#D7BDE2', '#F9E79F'];
             stones.push({
-                x: Math.random() * (sc.width - 100) + 50,
-                y: Math.random() * (sc.height - 200) + 50,
-                w: Math.random() * 60 + 40,
-                h: Math.random() * 40 + 30,
+                x: Math.random() * (sc.width - 100) + 50, y: Math.random() * (sc.height - 200) + 50,
+                w: Math.random() * 60 + 40, h: Math.random() * 40 + 30,
                 c: cols[Math.floor(Math.random() * cols.length)],
-                dx: Math.random() * 100,
-                dy: Math.random() * 100,
-                scale: 1.0,
+                dx: Math.random() * 100, dy: Math.random() * 100, scale: 1.0,
                 targetX: null, targetY: null
             });
         }
-
         function animS() {
             if (currentView !== 'sorting') { requestAnimationFrame(animS); return; }
             sctx.clearRect(0, 0, sc.width, sc.height);
-
-            // GHOST HAND LOGIC
             if (Date.now() - lastInteractionTime > 2000 && !dragS) {
-                // If idle for 2s, pick a stone to move
-                if (Math.random() < 0.02) { // rare trigger
+                if (Math.random() < 0.02) {
                     let s = stones[Math.floor(Math.random() * stones.length)];
-                    s.targetX = Math.random() * (sc.width - 100) + 50;
-                    s.targetY = Math.random() * (sc.height - 200) + 50;
-                    lastInteractionTime = Date.now(); // reset timer
+                    s.targetX = Math.random() * (sc.width - 100) + 50; s.targetY = Math.random() * (sc.height - 200) + 50;
+                    lastInteractionTime = Date.now();
                 }
             }
-
             stones.forEach(s => {
-                // Ghost Movement
                 if (s.targetX !== null) {
-                    s.x += (s.targetX - s.x) * 0.05;
-                    s.y += (s.targetY - s.y) * 0.05;
-                    if (Math.abs(s.x - s.targetX) < 5) s.targetX = null; // stop
+                    s.x += (s.targetX - s.x) * 0.05; s.y += (s.targetY - s.y) * 0.05;
+                    if (Math.abs(s.x - s.targetX) < 5) s.targetX = null;
                 }
-
-                // Floating
                 let floatX = s.x + Math.sin(Date.now() * 0.001 + s.dx) * 2;
                 let floatY = s.y + Math.cos(Date.now() * 0.001 + s.dy) * 2;
-
-                if (dragS === s) {
-                    floatX = s.x; floatY = s.y;
-                    s.scale += (1.2 - s.scale) * 0.2; // Scale up
-                } else {
-                    s.scale += (1.0 - s.scale) * 0.2; // Scale down
-                }
-
-                // Draw with 3D Effect
-                let dw = s.w * s.scale;
-                let dh = s.h * s.scale;
-
-                // Shadow
-                sctx.fillStyle = 'rgba(0,0,0,0.5)';
-                sctx.beginPath(); sctx.roundRect(floatX - dw / 2 + 4, floatY - dh / 2 + 4, dw, dh, 15); sctx.fill();
-
-                // Bevel (Dark Bottom)
-                sctx.fillStyle = adjustColor(s.c, -40);
-                sctx.beginPath(); sctx.roundRect(floatX - dw / 2, floatY - dh / 2 + 4, dw, dh, 15); sctx.fill();
-
-                // Main Body
-                sctx.fillStyle = s.c;
-                sctx.beginPath(); sctx.roundRect(floatX - dw / 2, floatY - dh / 2, dw, dh, 15); sctx.fill();
-
-                // Highlight (Top)
-                sctx.fillStyle = 'rgba(255,255,255,0.2)';
-                sctx.beginPath(); sctx.roundRect(floatX - dw / 2 + 5, floatY - dh / 2 + 2, dw - 10, dh / 2, 10); sctx.fill();
+                if (dragS === s) { floatX = s.x; floatY = s.y; s.scale += (1.2 - s.scale) * 0.2; } else { s.scale += (1.0 - s.scale) * 0.2; }
+                let dw = s.w * s.scale; let dh = s.h * s.scale;
+                sctx.fillStyle = 'rgba(0,0,0,0.5)'; sctx.beginPath(); sctx.roundRect(floatX - dw / 2 + 4, floatY - dh / 2 + 4, dw, dh, 15); sctx.fill();
+                sctx.fillStyle = s.c; sctx.beginPath(); sctx.roundRect(floatX - dw / 2, floatY - dh / 2, dw, dh, 15); sctx.fill();
+                sctx.fillStyle = 'rgba(255,255,255,0.2)'; sctx.beginPath(); sctx.roundRect(floatX - dw / 2 + 5, floatY - dh / 2 + 2, dw - 10, dh / 2, 10); sctx.fill();
             });
             requestAnimationFrame(animS);
         }
-
         function handleSStart(x, y) {
             lastInteractionTime = Date.now();
             for (let i = stones.length - 1; i >= 0; i--) {
                 let s = stones[i];
                 if (x > s.x - s.w / 2 - 20 && x < s.x + s.w / 2 + 20 && y > s.y - s.h / 2 - 20 && y < s.y + s.h / 2 + 20) {
-                    dragS = s; offX = x - s.x; offY = y - s.y;
-                    stones.splice(i, 1); stones.push(dragS); // bring to front
-                    s.targetX = null; // stop ghost move
-                    pulse(10);
-                    break;
+                    dragS = s; offX = x - s.x; offY = y - s.y; stones.splice(i, 1); stones.push(dragS); s.targetX = null; pulse(10); break;
                 }
             }
         }
-        function handleSMove(x, y) {
-            if (dragS) {
-                lastInteractionTime = Date.now();
-                dragS.x = x - offX; dragS.y = y - offY;
-            }
-        }
+        function handleSMove(x, y) { if (dragS) { lastInteractionTime = Date.now(); dragS.x = x - offX; dragS.y = y - offY; } }
         function handleSEnd() { if (dragS) pulse(10); dragS = null; }
-
-        // Helper to darken colors for bevel
-        function adjustColor(color, amount) {
-            return color; // Simplified for CSS colors, just returns base. 
-            // Real logic would parse hex/rgb, but simple colors work fine for "toy" look.
-        }
 
         // --- 3. BUBBLES ---
         const bc = document.getElementById('canvas-bubbles'); const bctx = bc.getContext('2d');
@@ -929,8 +886,7 @@
         function resizeB() {
             bc.width = window.innerWidth; bc.height = window.innerHeight;
             bubbles = []; popParticles = [];
-            const area = bc.width * bc.height;
-            maxBubbles = Math.min(80, Math.max(25, Math.floor(area / 8000)));
+            maxBubbles = Math.min(80, Math.max(25, Math.floor((bc.width * bc.height) / 8000)));
         }
         function spawnBubble(forceRandomY = false) {
             bubbles.push({ x: Math.random() * bc.width, y: forceRandomY ? Math.random() * bc.height : bc.height + 50, size: Math.random() * 40 + 15, speed: Math.random() * 1.5 + 0.5, wobble: Math.random() * Math.PI * 2, color: `hsla(${Math.random() * 40 + 180}, 70%, 70%, 0.3)` });
@@ -993,7 +949,6 @@
             lctx.fillStyle = 'rgba(5, 5, 5, 0.08)';
             lctx.fillRect(0, 0, lc.width, lc.height);
 
-            // Ghost Writer
             let time = Date.now() * 0.002;
             let gx = lc.width / 2 + Math.sin(time) * (lc.width / 3);
             let gy = lc.height / 2 + Math.cos(time * 1.3) * (lc.height / 4);
@@ -1034,16 +989,19 @@
         function handleMInput(x, y) {
             for (let i = 0; i < marbles.length; i++) {
                 let m = marbles[i];
-                let dx = m.x - x; let dy = m.y - y;
+                let dx = m.x - x;
+                let dy = m.y - y;
                 let dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 200) {
-                    let force = (200 - dist) / 200;
+
+                if (dist < 150) {
+                    let force = (150 - dist) / 150;
                     let angle = Math.atan2(dy, dx);
-                    m.vx += Math.cos(angle) * force * 2.5;
-                    m.vy += Math.sin(angle) * force * 2.5;
+                    m.vx += Math.cos(angle) * force * 1.5;
+                    m.vy += Math.sin(angle) * force * 1.5;
                 }
             }
         }
+
         function animM() {
             if (currentView !== 'marbles') { requestAnimationFrame(animM); return; }
             mx.clearRect(0, 0, mc.width, mc.height);
