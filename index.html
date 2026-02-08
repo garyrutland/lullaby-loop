@@ -113,6 +113,7 @@
             height: 100%;
         }
 
+        /* Breathe View */
         #view-breathe {
             display: none;
             flex-direction: column;
@@ -168,23 +169,23 @@
             padding: 20px;
         }
 
-        /* --- MODALS (Shared Styles) --- */
+        /* --- MODALS --- */
         .modal-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 340px;
+            width: 90%;
+            max-width: 360px;
             background: #1a1a1a;
             border: 1px solid #333;
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px;
             z-index: 2000;
             display: none;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
         }
 
-        /* Settings Modal Specifics */
         #timer-display {
             text-align: center;
             color: #4a90e2;
@@ -251,8 +252,14 @@
             margin-bottom: 5px;
         }
 
-        /* Instructions Modal Specifics */
-        #instructions-modal h2 {
+        .quit-btn {
+            background: #c0392b;
+            color: white;
+            margin-top: 15px;
+            border: 1px solid #e74c3c;
+        }
+
+        .modal-overlay h2 {
             font-size: 18px;
             color: white;
             margin-top: 0;
@@ -260,14 +267,14 @@
             padding-bottom: 10px;
         }
 
-        #instructions-modal p {
+        .modal-overlay p {
             font-size: 14px;
             color: #aaa;
             line-height: 1.5;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
-        #instructions-modal strong {
+        .modal-overlay strong {
             color: #ddd;
         }
 
@@ -286,7 +293,6 @@
             align-items: center;
         }
 
-        /* Info Button on Start Screen */
         #info-btn {
             position: absolute;
             top: 30px;
@@ -366,7 +372,6 @@
 
     <div id="app-container">
         <div id="sunset-overlay"></div>
-
         <div id="header-area">
             <div id="app-title">Lullaby Loop</div>
         </div>
@@ -377,13 +382,14 @@
             <button id="pause-btn" class="action-btn pause-btn" onclick="togglePause()">Pause Session</button>
 
             <div class="setting-row" style="margin-top: 20px;">
-                <span class="setting-label">Timer</span>
+                <span class="setting-label">Update Duration</span>
                 <button class="opt-btn time-btn" data-time="15" onclick="changeDuration(15)">15m</button>
                 <button class="opt-btn time-btn" data-time="30" onclick="changeDuration(30)">30m</button>
                 <button class="opt-btn time-btn" data-time="60" onclick="changeDuration(60)">60m</button>
                 <button class="opt-btn time-btn selected" data-time="90" onclick="changeDuration(90)">90m</button>
                 <button class="opt-btn time-btn" data-time="120" onclick="changeDuration(120)">120m</button>
             </div>
+
             <div class="setting-row">
                 <span class="setting-label">Soundscape</span>
                 <button class="opt-btn sound-btn selected" data-sound="deep" onclick="changeSound('deep')">Deep</button>
@@ -391,26 +397,39 @@
                 <button class="opt-btn sound-btn" data-sound="waves" onclick="changeSound('waves')">Waves</button>
                 <button class="opt-btn sound-btn" data-sound="off" onclick="changeSound('off')">OFF</button>
             </div>
+
             <button class="action-btn close-btn" onclick="closeSettings()">Close & Resume</button>
+            <button class="action-btn quit-btn" onclick="showQuitConfirm()">End Session</button>
+        </div>
+
+        <div id="confirm-modal" class="modal-overlay" style="z-index: 2500;">
+            <h2>End Session?</h2>
+            <p>This will stop the audio and return to the Start Screen.</p>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="action-btn close-btn" style="flex:1; margin-top:0;"
+                    onclick="closeQuitConfirm()">Cancel</button>
+                <button class="action-btn quit-btn" style="flex:1; margin-top:0;" onclick="resetApp()">End
+                    Session</button>
+            </div>
         </div>
 
         <div id="instructions-modal" class="modal-overlay">
             <h2>Parent Guide</h2>
-            <p><strong>1. The Goal:</strong> A low-stimulation environment to help wind down. No scores, no levels, just
-                flow.</p>
-            <p><strong>2. Hidden Menu:</strong> Long-press the "Lullaby Loop" title at the top for 3 seconds to access
-                Settings (Timer, Sound, Pause).</p>
-            <p><strong>3. Sunset Timer:</strong> The screen will slowly dim and the audio will fade out automatically
-                over the selected duration.</p>
-            <p><strong>4. Tips:</strong> Use "Guided Access" (iOS) or "App Pinning" (Android) to keep your child inside
+            <p><strong>1. The Goal:</strong> A low-stimulation environment to help wind down.</p>
+            <p><strong>2. Parent Menu:</strong> Long-press "Lullaby Loop" at the top (3 seconds) to change settings,
+                pause, or quit.</p>
+            <p><strong>3. Sunset Timer:</strong> The screen dims and audio fades out automatically.</p>
+            <p><strong>4. Tips:</strong> Use "Guided Access" (iOS) or "App Pinning" (Android) to lock your child inside
                 the app.</p>
-            <button class="action-btn close-btn"
+            <p><strong>5. Full Screen App:</strong> For the best experience, add this page to your device's Home Screen.
+            </p>
+
+            <button class="action-btn close-btn" style="margin-top: 20px;"
                 onclick="document.getElementById('instructions-modal').style.display='none'">Got it</button>
         </div>
 
         <div id="start-screen">
             <div id="info-btn" onclick="document.getElementById('instructions-modal').style.display='block'">?</div>
-
             <h1 style="font-weight: 300; color: #aaa; font-size: 24px; letter-spacing: 3px; margin-bottom: 20px;">
                 LULLABY LOOP</h1>
 
@@ -439,7 +458,6 @@
                     <button class="start-btn sound-btn" data-sound="off" onclick="changeSound('off')">Silent</button>
                 </div>
             </div>
-
             <div id="begin-btn">BEGIN SESSION</div>
         </div>
 
@@ -485,24 +503,24 @@
     </div>
 
     <script>
-        // --- CONFIG & STATE ---
+        // --- CONFIG ---
         let sessionMinutes = 90;
         let currentSound = 'deep';
         let audioCtx, gainNode, waveLFO;
         let timerInterval;
         let startTime = 0;
-        let elapsedSaved = 0; // Time tracked when paused
+        let elapsedSaved = 0;
         let isPaused = false;
         let isSessionRunning = false;
         let currentView = 'particles';
 
-        // --- UI REFS ---
         const titleEl = document.getElementById('app-title');
         const modal = document.getElementById('settings-modal');
+        const confirmModal = document.getElementById('confirm-modal');
         const timerDisplay = document.getElementById('timer-display');
         const pauseBtn = document.getElementById('pause-btn');
 
-        // --- PARENT SETTINGS LOGIC ---
+        // --- PARENT MENU LOGIC ---
         let pressTimer;
         titleEl.addEventListener('touchstart', startPress, { passive: false });
         titleEl.addEventListener('mousedown', startPress);
@@ -518,6 +536,7 @@
                 b.classList.remove('selected');
                 if (b.getAttribute('data-time') == mins) b.classList.add('selected');
             });
+            updateTimerText();
         }
 
         function changeSound(type) {
@@ -532,14 +551,10 @@
             }
         }
 
-        // --- PAUSE LOGIC ---
         function togglePause() {
             if (!isSessionRunning) return;
-
             isPaused = !isPaused;
-
             if (isPaused) {
-                // PAUSING
                 clearInterval(timerInterval);
                 elapsedSaved += Date.now() - startTime;
                 if (audioCtx) audioCtx.suspend();
@@ -547,43 +562,63 @@
                 pauseBtn.className = "action-btn resume-btn";
                 timerDisplay.innerText += " (PAUSED)";
             } else {
-                // RESUMING
                 startTime = Date.now();
-                startTimer(false); // Restart timer but don't reset elapsed
+                startTimer(false);
                 if (audioCtx) audioCtx.resume();
                 pauseBtn.innerText = "Pause Session";
                 pauseBtn.className = "action-btn pause-btn";
             }
         }
 
-        function closeSettings() {
+        function closeSettings() { modal.style.display = 'none'; }
+
+        // --- QUIT LOGIC ---
+        function showQuitConfirm() {
             modal.style.display = 'none';
+            confirmModal.style.display = 'block';
+        }
+
+        function closeQuitConfirm() {
+            confirmModal.style.display = 'none';
+            modal.style.display = 'block';
+        }
+
+        function resetApp() {
+            confirmModal.style.display = 'none';
+
+            if (audioCtx) audioCtx.suspend();
+            if (noiseSource) try { noiseSource.stop() } catch (e) { }
+
+            clearInterval(timerInterval);
+            isSessionRunning = false;
+            isPaused = false;
+            elapsedSaved = 0;
+
+            document.getElementById('sunset-overlay').style.opacity = 0;
+
+            document.getElementById('nav-bar').style.display = 'none';
+            document.getElementById('nav-bar').style.opacity = 0;
+            document.getElementById('start-screen').style.display = 'flex';
+
+            pauseBtn.innerText = "Pause Session";
+            pauseBtn.className = "action-btn pause-btn";
         }
 
         // --- AUDIO ENGINE ---
         let noiseSource;
-
         function initAudio() {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
 
-            if (!gainNode) {
-                gainNode = audioCtx.createGain();
-                gainNode.connect(audioCtx.destination);
-            }
+            if (!gainNode) { gainNode = audioCtx.createGain(); gainNode.connect(audioCtx.destination); }
             generateSoundBuffer(currentSound);
         }
 
         function generateSoundBuffer(type) {
             if (noiseSource) { try { noiseSource.stop(); } catch (e) { } }
             if (waveLFO) { try { waveLFO.stop(); } catch (e) { } }
-
-            if (type === 'off') {
-                gainNode.gain.value = 0;
-                return;
-            } else {
-                gainNode.gain.value = 0.8;
-            }
+            if (type === 'off') { gainNode.gain.value = 0; return; } else { gainNode.gain.value = 0.8; }
 
             const bufferSize = audioCtx.sampleRate * 2;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -610,7 +645,6 @@
                     b6 = white * 0.115926;
                 }
             }
-
             noiseSource = audioCtx.createBufferSource();
             noiseSource.buffer = buffer;
             noiseSource.loop = true;
@@ -647,38 +681,50 @@
             osc.stop(audioCtx.currentTime + 0.15);
         }
 
-        // --- SUNSET TIMER ---
+        // --- SUNSET TIMER LOGIC ---
         function startTimer(reset = true) {
             if (timerInterval) clearInterval(timerInterval);
-
-            if (reset) {
-                startTime = Date.now();
-                elapsedSaved = 0;
-            }
-
-            const overlay = document.getElementById('sunset-overlay');
-            const totalSeconds = sessionMinutes * 60;
+            if (reset) { startTime = Date.now(); elapsedSaved = 0; }
+            updateTimerText();
 
             timerInterval = setInterval(() => {
-                // Calculate total elapsed including any paused duration
-                const currentSessionElapsed = Math.floor((Date.now() - startTime) + elapsedSaved) / 1000;
-
-                let progress = currentSessionElapsed / totalSeconds;
-                if (progress > 1) progress = 1;
-
-                // UPDATE TIMER UI
-                let remaining = totalSeconds - currentSessionElapsed;
-                if (remaining < 0) remaining = 0;
-                let rMin = Math.floor(remaining / 60);
-                let rSec = Math.floor(remaining % 60);
-                timerDisplay.innerText = `Time Left: ${rMin}m ${rSec < 10 ? '0' : ''}${rSec}s`;
-
-                if (progress > 0.5) {
-                    const fade = (progress - 0.5) * 2;
-                    overlay.style.opacity = fade * 0.98;
-                    if (currentSound !== 'off' && gainNode) gainNode.gain.value = 0.8 * (1 - fade);
-                }
+                updateTimerText();
+                checkSunset();
             }, 1000);
+        }
+
+        function getCurrentElapsed() {
+            return Math.floor((Date.now() - startTime) + elapsedSaved) / 1000;
+        }
+
+        function updateTimerText() {
+            if (!isSessionRunning) return;
+            const totalSeconds = sessionMinutes * 60;
+            const currentSessionElapsed = isPaused ? (elapsedSaved / 1000) : getCurrentElapsed();
+
+            let remaining = totalSeconds - currentSessionElapsed;
+            if (remaining < 0) remaining = 0;
+
+            let rMin = Math.floor(remaining / 60);
+            let rSec = Math.floor(remaining % 60);
+
+            let text = `Time Left: ${rMin}m ${rSec < 10 ? '0' : ''}${rSec}s`;
+            if (isPaused) text += " (PAUSED)";
+            timerDisplay.innerText = text;
+        }
+
+        function checkSunset() {
+            if (isPaused) return;
+            const totalSeconds = sessionMinutes * 60;
+            const elapsed = getCurrentElapsed();
+            let progress = elapsed / totalSeconds;
+            if (progress > 1) progress = 1;
+
+            if (progress > 0.5) {
+                const fade = (progress - 0.5) * 2;
+                document.getElementById('sunset-overlay').style.opacity = fade * 0.98;
+                if (currentSound !== 'off' && gainNode) gainNode.gain.value = 0.8 * (1 - fade);
+            }
         }
 
         // --- VIEW MANAGEMENT ---
@@ -697,6 +743,7 @@
         ['mousedown', 'touchstart'].forEach(evt => window.addEventListener(evt, e => {
             const x = e.touches ? e.touches[0].clientX : e.clientX;
             const y = e.touches ? e.touches[0].clientY : e.clientY;
+
             if (currentView === 'sorting') handleSStart(x, y);
             if (currentView === 'bubbles') handleBStart(x, y);
             if (currentView === 'drawing') handleDStart(x, y);
@@ -729,14 +776,31 @@
             requestAnimationFrame(animP);
         }
 
-        // --- 2. SORTING ---
+        // --- 2. SORTING (Updated) ---
         const sc = document.getElementById('canvas-sorting'); const sctx = sc.getContext('2d');
         let stones = [], dragS = null, offX = 0, offY = 0;
         function resizeS() { sc.width = window.innerWidth; sc.height = window.innerHeight; if (!stones.length) initS(); }
+
         function initS() {
             const cols = ['#5D6D7E', '#A9DFBF', '#F5B7B1', '#D7BDE2', '#F9E79F'];
-            for (let i = 0; i < 12; i++) stones.push({ x: Math.random() * (sc.width - 100) + 50, y: Math.random() * (sc.height - 200) + 50, w: Math.random() * 60 + 40, h: Math.random() * 40 + 30, c: cols[Math.floor(Math.random() * cols.length)] });
+            // Auto-calculate number based on screen size (Density ~ 35000px per stone)
+            const area = sc.width * sc.height;
+            const count = Math.min(Math.max(Math.floor(area / 35000), 10), 30);
+
+            for (let i = 0; i < count; i++) spawnStone(cols);
         }
+
+        function spawnStone(cols) {
+            if (!cols) cols = ['#5D6D7E', '#A9DFBF', '#F5B7B1', '#D7BDE2', '#F9E79F'];
+            stones.push({
+                x: Math.random() * (sc.width - 100) + 50,
+                y: Math.random() * (sc.height - 200) + 50,
+                w: Math.random() * 60 + 40,
+                h: Math.random() * 40 + 30,
+                c: cols[Math.floor(Math.random() * cols.length)]
+            });
+        }
+
         function animS() {
             if (currentView !== 'sorting') { requestAnimationFrame(animS); return; }
             sctx.clearRect(0, 0, sc.width, sc.height);
@@ -754,10 +818,22 @@
         function handleSMove(x, y) { if (dragS) { dragS.x = x - offX; dragS.y = y - offY; } }
         function handleSEnd() { if (dragS) pulse(10); dragS = null; }
 
-        // --- 3. BUBBLES ---
+        // --- 3. BUBBLES (Updated) ---
         const bc = document.getElementById('canvas-bubbles'); const bctx = bc.getContext('2d');
         let bubbles = [];
-        function resizeB() { bc.width = window.innerWidth; bc.height = window.innerHeight; }
+        let popParticles = [];
+        let maxBubbles = 35; // Default
+
+        function resizeB() {
+            bc.width = window.innerWidth; bc.height = window.innerHeight;
+            bubbles = []; popParticles = [];
+
+            // Smart Density: Calculate based on screen area
+            const area = bc.width * bc.height;
+            // Density ~8000px per bubble. Cap at 80 for tablet, min 25 for small phone.
+            maxBubbles = Math.min(80, Math.max(25, Math.floor(area / 8000)));
+        }
+
         function spawnBubble(forceRandomY = false) {
             bubbles.push({
                 x: Math.random() * bc.width,
@@ -766,16 +842,42 @@
                 wobble: Math.random() * Math.PI * 2, color: `hsla(${Math.random() * 40 + 180}, 70%, 70%, 0.3)`
             });
         }
+        function createPop(x, y, color) {
+            let count = 8 + Math.random() * 4;
+            for (let i = 0; i < count; i++) {
+                let angle = (Math.PI * 2 * i) / count;
+                let speed = 2 + Math.random() * 3;
+                popParticles.push({
+                    x: x, y: y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+                    life: 1.0, color: color.replace('0.3', '0.8'), size: Math.random() * 3 + 2
+                });
+            }
+            popParticles.push({ x: x, y: y, size: 10, type: 'ring', life: 1.0, color: 'rgba(255,255,255,0.5)' });
+        }
         function animB() {
             if (currentView !== 'bubbles') { requestAnimationFrame(animB); return; }
             bctx.clearRect(0, 0, bc.width, bc.height);
-            if (bubbles.length < 35 && Math.random() < 0.1) spawnBubble();
-            if (bubbles.length === 0) for (let i = 0; i < 30; i++) spawnBubble(true);
+
+            // Uses calculated maxBubbles
+            if (bubbles.length < maxBubbles && Math.random() < 0.1) spawnBubble();
+            if (bubbles.length === 0) for (let i = 0; i < maxBubbles / 2; i++) spawnBubble(true);
+
             for (let i = 0; i < bubbles.length; i++) {
                 let b = bubbles[i]; b.y -= b.speed; b.x += Math.sin(b.y * 0.01 + b.wobble) * 0.5;
                 bctx.beginPath(); bctx.arc(b.x, b.y, b.size, 0, Math.PI * 2); bctx.fillStyle = b.color; bctx.fill();
                 bctx.strokeStyle = "rgba(255,255,255,0.4)"; bctx.lineWidth = 2; bctx.stroke();
                 if (b.y < -60) { bubbles.splice(i, 1); i--; }
+            }
+            for (let i = 0; i < popParticles.length; i++) {
+                let p = popParticles[i]; p.life -= 0.04;
+                if (p.life <= 0) { popParticles.splice(i, 1); i--; continue; }
+                if (p.type === 'ring') {
+                    p.size += 3; bctx.beginPath(); bctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    bctx.strokeStyle = `rgba(255,255,255,${p.life * 0.5})`; bctx.lineWidth = 2; bctx.stroke();
+                } else {
+                    p.x += p.vx; p.y += p.vy; bctx.beginPath(); bctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    bctx.fillStyle = p.color; bctx.globalAlpha = p.life; bctx.fill(); bctx.globalAlpha = 1.0;
+                }
             }
             requestAnimationFrame(animB);
         }
@@ -783,9 +885,7 @@
             for (let i = bubbles.length - 1; i >= 0; i--) {
                 let b = bubbles[i];
                 if (Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2) < b.size + 10) {
-                    bubbles.splice(i, 1); pulse(10); playPopSound();
-                    bctx.beginPath(); bctx.arc(b.x, b.y, b.size * 1.5, 0, Math.PI * 2); bctx.fillStyle = "rgba(255,255,255,0.8)"; bctx.fill();
-                    break;
+                    createPop(b.x, b.y, b.color); bubbles.splice(i, 1); pulse(10); playPopSound(); break;
                 }
             }
         }
