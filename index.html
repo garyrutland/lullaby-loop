@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Lullaby Loop</title>
+    <title>Luma Loop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Lullaby Loop">
+    <meta name="apple-mobile-web-app-title" content="Luma Loop">
 
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -29,7 +29,6 @@
             -webkit-user-select: none;
         }
 
-        /* Global Box Sizing */
         * {
             box-sizing: border-box;
         }
@@ -40,7 +39,6 @@
             height: 100%;
         }
 
-        /* Sunset Overlay */
         #sunset-overlay {
             position: fixed;
             top: 0;
@@ -120,7 +118,6 @@
             touch-action: none;
         }
 
-        /* --- HEADER --- */
         #header-area {
             position: fixed;
             top: 0;
@@ -213,7 +210,7 @@
             text-decoration: none;
         }
 
-        .close-btn, .donate-btn {
+        .close-btn {
             background: #444;
             color: white;
             margin-bottom: 10px;
@@ -244,6 +241,20 @@
             margin-top: 0;
         }
 
+        .donate-btn {
+            background: #333;
+            color: #f1c40f;
+            border: none;
+            margin-top: 5px;
+            font-size: 13px;
+            font-weight: normal;
+            transition: background 0.2s;
+        }
+
+        .donate-btn:active {
+            background: #444;
+        }
+
         .modal-overlay h2 {
             font-size: 18px;
             color: white;
@@ -257,11 +268,6 @@
             color: #aaa;
             line-height: 1.5;
             margin-bottom: 12px;
-        }
-
-        .modal-overlay strong {
-            color: #fff;
-            font-weight: 600;
         }
 
         /* --- START SCREEN --- */
@@ -380,7 +386,7 @@
     <div id="app-container">
         <div id="sunset-overlay"></div>
         <div id="header-area">
-            <div id="app-title">Lullaby Loop</div>
+            <div id="app-title">Luma Loop</div>
         </div>
 
         <div id="settings-modal" class="modal-overlay">
@@ -397,18 +403,23 @@
             </div>
 
             <div class="setting-row">
-                <span class="setting-label">Soundscape</span>
+                <span class="setting-label">Soundscape (Background)</span>
                 <button class="opt-btn sound-btn selected" data-sound="deep" onclick="changeSound('deep')">Deep</button>
                 <button class="opt-btn sound-btn" data-sound="rain" onclick="changeSound('rain')">Rain</button>
                 <button class="opt-btn sound-btn" data-sound="static" onclick="changeSound('static')">Static</button>
                 <button class="opt-btn sound-btn" data-sound="waves" onclick="changeSound('waves')">Waves</button>
-                <button class="opt-btn sound-btn" data-sound="off" onclick="changeSound('off')">OFF</button>
+                <button class="opt-btn sound-btn" data-sound="off" onclick="changeSound('off')">Silent</button>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label">Interactive Effects</span>
+                <button class="opt-btn sfx-btn selected" data-sfx="on" onclick="setSFX('on')">ON</button>
+                <button class="opt-btn sfx-btn" data-sfx="off" onclick="setSFX('off')">OFF</button>
             </div>
 
             <button class="action-btn close-btn" onclick="closeSettings()">Close & Resume</button>
-
-            <a href="https://buymeacoffee.com/gary.rutland" target="_blank" class="action-btn donate-btn">Buy Developer a Coffee</a>
-
+            <a href="https://buymeacoffee.com/gary.rutland" target="_blank" class="action-btn donate-btn">☕ Buy
+                Developer a Coffee</a>
             <button class="action-btn quit-btn" onclick="showQuitConfirm()">End Session</button>
         </div>
 
@@ -439,29 +450,23 @@
         <div id="instructions-modal" class="modal-overlay">
             <h2>Parent Guide</h2>
             <p><strong>1. The Goal:</strong> A low-stimulation environment to help wind down.</p>
-            <p><strong>2. Parent Menu:</strong> Tap the "Lullaby Loop" title 5 times quickly to access settings.</p>
+            <p><strong>2. Parent Menu:</strong> Tap the "Luma Loop" title 5 times quickly to access settings.</p>
             <p><strong>3. Sunset Timer:</strong> The screen dims and audio fades out automatically.</p>
             <p><strong>4. Tips:</strong> Use "Guided Access" (iOS) or "App Pinning" (Android) to lock your child inside
                 the app.</p>
-            <p><strong>5. Full Screen App:</strong> For the best experience, add this page to your device's Home Screen.
-            </p>
-
             <button class="action-btn close-btn" style="margin-top: 20px;"
                 onclick="document.getElementById('instructions-modal').style.display='none'">Got it</button>
         </div>
 
         <div id="start-screen">
-            <div id="update-btn" onclick="document.getElementById('update-modal').style.display='block'">
-                <svg viewBox="0 0 24 24">
+            <div id="update-btn" onclick="document.getElementById('update-modal').style.display='block'"><svg
+                    viewBox="0 0 24 24">
                     <path
                         d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
-                </svg>
-            </div>
+                </svg></div>
             <div id="info-btn" onclick="document.getElementById('instructions-modal').style.display='block'">?</div>
-
-            <h1 style="font-weight: 300; color: #aaa; font-size: 24px; letter-spacing: 3px; margin-bottom: 20px;">
-                LULLABY LOOP</h1>
-
+            <h1 style="font-weight: 300; color: #aaa; font-size: 24px; letter-spacing: 3px; margin-bottom: 20px;">LUMA
+                LOOP</h1>
             <div class="picker-section">
                 <p class="picker-label">Duration</p>
                 <div class="start-opt-row">
@@ -474,7 +479,6 @@
                     <button class="start-btn time-btn" data-time="120" onclick="changeDuration(120)">120m</button>
                 </div>
             </div>
-
             <div class="picker-section">
                 <p class="picker-label">Atmosphere</p>
                 <div class="start-opt-row">
@@ -494,35 +498,29 @@
 
         <div id="nav-bar" style="display:none; opacity: 0; transition: opacity 2s;">
             <div class="nav-btn active" id="btn-particles" onclick="switchView('particles')"
-                ontouchstart="switchView('particles')">
-                <svg viewBox="0 0 24 24">
+                ontouchstart="switchView('particles')"><svg viewBox="0 0 24 24">
                     <path
                         d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-                </svg>
-            </div>
+                </svg></div>
             <div class="nav-btn" id="btn-sorting" onclick="switchView('sorting')" ontouchstart="switchView('sorting')">
                 <svg viewBox="0 0 24 24">
                     <path d="M3 3H11V11H3V3ZM13 3H21V11H13V3ZM3 13H11V21H3V13ZM13 13H21V21H13V13Z" />
-                </svg>
-            </div>
+                </svg></div>
             <div class="nav-btn" id="btn-bubbles" onclick="switchView('bubbles')" ontouchstart="switchView('bubbles')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" />
-                </svg>
-            </div>
-            <div class="nav-btn" id="btn-liquid" onclick="switchView('liquid')" ontouchstart="switchView('liquid')">
-                <svg viewBox="0 0 24 24">
+                </svg></div>
+            <div class="nav-btn" id="btn-liquid" onclick="switchView('liquid')" ontouchstart="switchView('liquid')"><svg
+                    viewBox="0 0 24 24">
                     <path
                         d="M12,2c-5.33,4.55-8,8.48-8,11.8c0,4.98,3.8,8.2,8,8.2s8-3.22,8-8.2C20,10.48,17.33,6.55,12,2z M12,20c-3.35,0-6-2.57-6-6.2c0-2.34,1.95-5.44,6-9.14c4.05,3.7,6,6.79,6,9.14C18,17.43,15.35,20,12,20z" />
-                </svg>
-            </div>
+                </svg></div>
             <div class="nav-btn" id="btn-marbles" onclick="switchView('marbles')" ontouchstart="switchView('marbles')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-5 10c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm10 0c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm-5 7c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
-                </svg>
-            </div>
+                </svg></div>
         </div>
 
         <div id="view-container">
@@ -534,6 +532,7 @@
         // --- CONFIG ---
         let sessionMinutes = 90;
         let currentSound = 'deep';
+        let sfxEnabled = true; // NEW STATE
         let audioCtx, gainNode, waveLFO;
         let timerInterval;
         let startTime = 0;
@@ -554,6 +553,7 @@
 
         let entities = [];
         let lastInteraction = Date.now();
+        let lastSFX = 0;
 
         // --- PARENT MENU LOGIC ---
         let tapCount = 0;
@@ -593,6 +593,15 @@
             }
         }
 
+        // NEW: SFX TOGGLE FUNCTION
+        function setSFX(val) {
+            sfxEnabled = (val === 'on');
+            document.querySelectorAll('.sfx-btn').forEach(b => {
+                b.classList.remove('selected');
+                if (b.getAttribute('data-sfx') === val) b.classList.add('selected');
+            });
+        }
+
         function togglePause() {
             if (!isSessionRunning) return;
             isPaused = !isPaused;
@@ -613,7 +622,6 @@
         }
 
         function closeSettings() { modal.style.display = 'none'; }
-
         function showQuitConfirm() { modal.style.display = 'none'; confirmModal.style.display = 'block'; }
         function closeQuitConfirm() { confirmModal.style.display = 'none'; modal.style.display = 'block'; }
         function resetApp() {
@@ -695,28 +703,81 @@
             }
         }
 
-        function playPopSound() {
-            if (currentSound === 'off' || !audioCtx) return;
+        // --- NEW INTERACTIVE SFX ENGINE ---
+        function playSFX(type) {
+            // CHECK 1: Is AudioContext ready?
+            if (!audioCtx) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            // CHECK 2: Is SFX enabled by parent?
+            if (!sfxEnabled) return;
+
+            // CHECK 3: Rate limit 'clack' to prevent noise overlap
+            if (type === 'clack' && Date.now() - lastSFX < 80) return;
+            lastSFX = Date.now();
+
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
+
+            const t = audioCtx.currentTime;
+
+            if (type === 'chime') {
+                osc.type = 'sine';
+                const freqs = [523.25, 659.25, 783.99, 1046.50];
+                osc.frequency.value = freqs[Math.floor(Math.random() * freqs.length)];
+                gain.gain.setValueAtTime(0.15, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
+                osc.start(t);
+                osc.stop(t + 1.0);
+            } else if (type === 'clack') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300 + Math.random() * 100, t);
+                osc.frequency.exponentialRampToValueAtTime(100, t + 0.1);
+                gain.gain.setValueAtTime(0.3, t); // Boosted Volume
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+                osc.start(t);
+                osc.stop(t + 0.1);
+            } else if (type === 'pop') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, t);
+                osc.frequency.exponentialRampToValueAtTime(100, t + 0.15);
+                gain.gain.setValueAtTime(0.4, t); // Boosted Volume
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+                osc.start(t);
+                osc.stop(t + 0.15);
+            } else if (type === 'swoosh') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(100, t);
+                osc.frequency.linearRampToValueAtTime(50, t + 0.3);
+                gain.gain.setValueAtTime(0.3, t); // Boosted Volume
+                gain.gain.linearRampToValueAtTime(0.001, t + 0.3);
+                osc.start(t);
+                osc.stop(t + 0.3);
+            } else if (type === 'ping') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, t);
+                gain.gain.setValueAtTime(0.15, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+                osc.start(t);
+                osc.stop(t + 1.5);
+            }
         }
+
+        // --- AUDIO KICKSTART ---
+        document.body.addEventListener('touchstart', function () {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
 
         // --- SUNSET TIMER ---
         function startTimer(reset = true) {
             if (timerInterval) clearInterval(timerInterval);
             if (reset) { startTime = Date.now(); elapsedSaved = 0; }
             updateTimerText();
-            timerInterval = setInterval(() => { updateTimerText(); checkSunset(); }, 1000);
+            timerInterval = setInterval(() => { updateTimerText(); checkSunset(); checkIdle(); }, 1000);
         }
         function getCurrentElapsed() { return Math.floor((Date.now() - startTime) + elapsedSaved) / 1000; }
         function updateTimerText() {
@@ -742,6 +803,48 @@
             }
         }
 
+        // --- IDLE LOGIC ---
+        function checkIdle() {
+            if (!isSessionRunning || isPaused) return;
+            let idleTime = Date.now() - lastInteraction;
+
+            if (idleTime > 2000 && Math.random() < 0.05) {
+                ghostInteraction();
+            }
+
+            if (idleTime > 30000) {
+                const games = ['particles', 'sorting', 'bubbles', 'liquid', 'marbles'];
+                let next = games[Math.floor(Math.random() * games.length)];
+                while (next === currentView) next = games[Math.floor(Math.random() * games.length)];
+                switchView(next);
+                lastInteraction = Date.now() - 2000;
+            }
+        }
+
+        function ghostInteraction() {
+            let cx = Math.random() * canvas.width;
+            let cy = Math.random() * canvas.height;
+
+            if (currentView === 'particles') spawnParticle(cx, cy);
+            if (currentView === 'bubbles') spawnBubble();
+            if (currentView === 'liquid') spawnLiquid(cx, cy);
+            if (currentView === 'sorting') {
+                if (entities.length > 0) {
+                    let s = entities[Math.floor(Math.random() * entities.length)];
+                    s.dx += (Math.random() - 0.5) * 50;
+                    s.dy += (Math.random() - 0.5) * 50;
+                    s.vAngle += (Math.random() - 0.5) * 0.1;
+                }
+            }
+            if (currentView === 'marbles') {
+                if (entities.length > 0) {
+                    let m = entities[Math.floor(Math.random() * entities.length)];
+                    m.vx += (Math.random() - 0.5) * 15;
+                    m.vy += (Math.random() - 0.5) * 15;
+                }
+            }
+        }
+
         // --- VIEW MANAGEMENT ---
         function switchView(viewName) {
             currentView = viewName;
@@ -749,7 +852,7 @@
             const btn = document.getElementById(`btn-${viewName}`);
             if (btn) btn.classList.add('active');
 
-            entities = []; // Reset game state
+            entities = [];
             if (viewName === 'sorting') initSorting();
             if (viewName === 'bubbles') initBubbles();
             if (viewName === 'marbles') initMarbles();
@@ -762,20 +865,18 @@
 
         function handleInput(e, type) {
             if (e.target.closest('.nav-btn') || e.target.closest('#header-area') || e.target.closest('.modal-overlay')) return;
-
             e.preventDefault();
-
             const t = e.touches ? e.touches[0] : e;
             const x = t.clientX; const y = t.clientY;
 
             lastInteraction = Date.now();
 
             if (type === 'start') {
-                if (currentView === 'particles') spawnParticle(x, y);
-                if (currentView === 'sorting') handleSStart(x, y);
-                if (currentView === 'bubbles') handleBStart(x, y);
-                if (currentView === 'liquid') spawnLiquid(x, y);
-                if (currentView === 'marbles') handleMInput(x, y);
+                if (currentView === 'particles') { spawnParticle(x, y); playSFX('chime'); }
+                if (currentView === 'sorting') { handleSStart(x, y); }
+                if (currentView === 'bubbles') { handleBStart(x, y); }
+                if (currentView === 'liquid') { spawnLiquid(x, y); playSFX('ping'); }
+                if (currentView === 'marbles') { handleMInput(x, y); }
             } else if (type === 'move') {
                 if (currentView === 'particles') spawnParticle(x, y);
                 if (currentView === 'sorting') handleSMove(x, y);
@@ -797,7 +898,6 @@
         function spawnParticle(x, y) { entities.push({ x, y, vx: (Math.random() - .5) * 2, vy: (Math.random() - .5) * 2, life: 1, hue: Math.random() * 60 + 200 }); }
         function animParticles() {
             ctx.fillStyle = 'rgba(5,5,5,0.2)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            if (Math.random() < 0.05) spawnParticle(Math.random() * canvas.width, Math.random() * canvas.height);
             for (let i = 0; i < entities.length; i++) {
                 let p = entities[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.01;
                 if (p.life > 0) { ctx.beginPath(); ctx.arc(p.x, p.y, Math.random() * 15 + 5, 0, Math.PI * 2); ctx.fillStyle = `hsla(${p.hue},80%,60%,${p.life})`; ctx.fill(); }
@@ -805,94 +905,67 @@
             }
         }
 
-        // 2. SORTING (Updated with Header Repulsion)
+        // 2. SORTING (Updated SFX)
         let dragS = null, offX = 0, offY = 0;
         function initSorting() {
             const cols = ['#5D6D7E', '#A9DFBF', '#F5B7B1', '#D7BDE2', '#F9E79F'];
-            // Spawn lower down (+100px)
-            for (let i = 0; i < 15; i++) entities.push({ x: Math.random() * (canvas.width - 100) + 50, y: Math.random() * (canvas.height - 200) + 100, w: Math.random() * 60 + 40, h: Math.random() * 40 + 30, c: cols[Math.floor(Math.random() * cols.length)], dx: Math.random() * 100, dy: Math.random() * 100, scale: 1.0, targetX: null, targetY: null });
+            for (let i = 0; i < 20; i++) entities.push({ x: Math.random() * (canvas.width - 100) + 50, y: Math.random() * (canvas.height - 200) + 100, w: Math.random() * 60 + 40, h: Math.random() * 40 + 30, c: cols[Math.floor(Math.random() * cols.length)], angle: Math.random() * Math.PI, vAngle: (Math.random() - 0.5) * 0.02, dx: Math.random() * 100, dy: Math.random() * 100, scale: 1.0, targetX: null, prevX: 0 });
         }
         function handleSStart(x, y) {
             for (let i = entities.length - 1; i >= 0; i--) {
                 let s = entities[i];
                 if (x > s.x - s.w / 2 - 20 && x < s.x + s.w / 2 + 20 && y > s.y - s.h / 2 - 20 && y < s.y + s.h / 2 + 20) {
-                    dragS = s; offX = x - s.x; offY = y - s.y; entities.splice(i, 1); entities.push(dragS); s.targetX = null; pulse(10); break;
+                    dragS = s; offX = x - s.x; offY = y - s.y;
+                    entities.splice(i, 1); entities.push(dragS);
+                    s.targetX = null; s.prevX = x;
+                    pulse(10); playSFX('swoosh');
+                    break;
                 }
             }
         }
-        function handleSMove(x, y) { if (dragS) { dragS.x = x - offX; dragS.y = y - offY; } }
+        function handleSMove(x, y) {
+            if (dragS) { let speedX = x - dragS.prevX; dragS.vAngle = speedX * 0.005; dragS.prevX = x; dragS.x = x - offX; dragS.y = y - offY; }
+        }
         function handleSEnd() { dragS = null; }
+
         function animSorting() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (Date.now() - lastInteraction > 2000 && !dragS && Math.random() < 0.02) {
-                let s = entities[Math.floor(Math.random() * entities.length)]; s.targetX = Math.random() * (canvas.width - 100) + 50; s.targetY = Math.random() * (canvas.height - 200) + 50; lastInteraction = Date.now();
-            }
+            ctx.fillStyle = 'rgba(5,5,5,0.3)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             entities.forEach(s => {
-                // Ghost Hand
                 if (s.targetX !== null) { s.x += (s.targetX - s.x) * 0.05; s.y += (s.targetY - s.y) * 0.05; if (Math.abs(s.x - s.targetX) < 5) s.targetX = null; }
-
-                // Header Repulsion (The "Stuck Block" Fix)
                 if (s.y < 100 && dragS !== s) { s.y += 1; }
-
-                let fx = s.x + Math.sin(Date.now() * 0.001 + s.dx) * 2, fy = s.y + Math.cos(Date.now() * 0.001 + s.dy) * 2;
-                if (dragS === s) { fx = s.x; fy = s.y; s.scale += (1.2 - s.scale) * 0.2; } else { s.scale += (1.0 - s.scale) * 0.2; }
-                let dw = s.w * s.scale, dh = s.h * s.scale;
-                ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.roundRect(fx - dw / 2 + 4, fy - dh / 2 + 4, dw, dh, 15); ctx.fill();
-                ctx.fillStyle = s.c; ctx.beginPath(); ctx.roundRect(fx - dw / 2, fy - dh / 2, dw, dh, 15); ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.beginPath(); ctx.roundRect(fx - dw / 2 + 5, fy - dh / 2 + 2, dw - 10, dh / 2, 10); ctx.fill();
+                s.angle += s.vAngle; s.vAngle *= 0.95;
+                let fx = s.x, fy = s.y;
+                if (dragS !== s) { fx += Math.sin(Date.now() * 0.001 + s.dx) * 2; fy += Math.cos(Date.now() * 0.001 + s.dy) * 2; s.scale += (1.0 - s.scale) * 0.2; } else { s.scale += (1.2 - s.scale) * 0.2; }
+                ctx.save(); ctx.translate(fx, fy); ctx.rotate(s.angle); ctx.scale(s.scale, s.scale);
+                let dw = s.w, dh = s.h;
+                ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.roundRect(-dw / 2 + 4, -dh / 2 + 4, dw, dh, 15); ctx.fill();
+                ctx.fillStyle = s.c; ctx.beginPath(); ctx.roundRect(-dw / 2, -dh / 2, dw, dh, 15); ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.beginPath(); ctx.roundRect(-dw / 2 + 5, -dh / 2 + 2, dw - 10, dh / 2, 10); ctx.fill();
+                ctx.restore();
             });
         }
 
-        // 3. BUBBLES - AMBIENT MODE (Updated)
+        // 3. BUBBLES
         function initBubbles() {
-            // Fill screen immediately
             let maxB = Math.min(80, Math.max(25, Math.floor((canvas.width * canvas.height) / 8000)));
-            for (let i = 0; i < maxB; i++) {
-                entities.push({
-                    type: 'b',
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    s: Math.random() * 40 + 15,
-                    scale: 1.0, // Start full size
-                    sp: Math.random() * 1.5 + 0.5,
-                    w: Math.random() * Math.PI * 2,
-                    c: `hsla(${Math.random() * 40 + 180},70%,70%,0.3)`
-                });
-            }
+            for (let i = 0; i < maxB; i++) { entities.push({ type: 'b', x: Math.random() * canvas.width, y: Math.random() * canvas.height, s: Math.random() * 40 + 15, scale: 1.0, sp: Math.random() * 1.5 + 0.5, w: Math.random() * Math.PI * 2, c: `hsla(${Math.random() * 40 + 180},70%,70%,0.3)` }); }
         }
-        function spawnBubble() {
-            // Spawn anywhere
-            entities.push({
-                type: 'b',
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height + 50, // Mostly bottom, but varied
-                s: Math.random() * 40 + 15,
-                scale: 0.1, // Start small and grow
-                sp: Math.random() * 1.5 + 0.5,
-                w: Math.random() * Math.PI * 2,
-                c: `hsla(${Math.random() * 40 + 180},70%,70%,0.3)`
-            });
-        }
+        function spawnBubble() { entities.push({ type: 'b', x: Math.random() * canvas.width, y: Math.random() * canvas.height + 50, s: Math.random() * 40 + 15, scale: 0.1, sp: Math.random() * 1.5 + 0.5, w: Math.random() * Math.PI * 2, c: `hsla(${Math.random() * 40 + 180},70%,70%,0.3)` }); }
         function handleBStart(x, y) {
             for (let i = entities.length - 1; i >= 0; i--) {
                 let b = entities[i];
-                if (b.type === 'b' && Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2) < b.s + 20) { createPop(b.x, b.y, b.c); entities.splice(i, 1); pulse(10); playPopSound(); break; }
+                if (b.type === 'b' && Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2) < b.s + 20) { createPop(b.x, b.y, b.c); entities.splice(i, 1); pulse(10); playSFX('pop'); break; }
             }
         }
         function createPop(x, y, c) { for (let i = 0; i < 8; i++) entities.push({ type: 'p', x, y, vx: Math.cos(Math.PI * 2 * i / 8) * 3, vy: Math.sin(Math.PI * 2 * i / 8) * 3, l: 1, c: c.replace('0.3', '0.8') }); }
         function animBubbles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Maintain density (refill if popping)
             let maxB = Math.min(80, Math.max(25, Math.floor((canvas.width * canvas.height) / 8000)));
             if (entities.filter(e => e.type === 'b').length < maxB && Math.random() < 0.05) spawnBubble();
-
             for (let i = 0; i < entities.length; i++) {
                 let e = entities[i];
                 if (e.type === 'b') {
-                    // Grow in logic
                     if (e.scale < 1.0) e.scale += 0.05;
-
                     e.y -= e.sp; e.x += Math.sin(e.y * 0.01 + e.w) * 0.5;
                     ctx.beginPath(); ctx.arc(e.x, e.y, e.s * e.scale, 0, Math.PI * 2); ctx.fillStyle = e.c; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 2; ctx.stroke();
                     if (e.y < -60) { entities.splice(i, 1); i--; }
@@ -905,17 +978,15 @@
         }
 
         // 4. LIQUID
-        function spawnLiquid(x, y) {
-            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI * 2); ctx.fillStyle = `hsl(${Date.now() % 360},70%,60%)`; ctx.shadowBlur = 40; ctx.shadowColor = ctx.fillStyle; ctx.fill(); ctx.shadowBlur = 0;
-        }
+        function spawnLiquid(x, y) { ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI * 2); ctx.fillStyle = `hsl(${Date.now() % 360},70%,60%)`; ctx.shadowBlur = 40; ctx.shadowColor = ctx.fillStyle; ctx.fill(); ctx.shadowBlur = 0; }
         function animLiquid() {
             ctx.fillStyle = 'rgba(5,5,5,0.08)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             let t = Date.now() * 0.002; spawnLiquid(canvas.width / 2 + Math.sin(t) * (canvas.width / 3), canvas.height / 2 + Math.cos(t * 1.3) * (canvas.height / 4));
         }
 
-        // 5. MARBLES (Updated with Ceiling)
+        // 5. MARBLES
         function initMarbles() {
-            for (let i = 0; i < 15; i++) entities.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - .5) * 2, vy: (Math.random() - .5) * 2, r: Math.random() * 15 + 15, c: `hsl(${Math.random() * 360},60%,60%)` });
+            for (let i = 0; i < 50; i++) entities.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - .5) * 2, vy: (Math.random() - .5) * 2, r: Math.random() * 15 + 15, c: `hsl(${Math.random() * 360},60%,60%)` });
         }
         function handleMInput(x, y) {
             entities.forEach(m => {
@@ -924,13 +995,13 @@
             });
         }
         function animMarbles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(5,5,5,0.3)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < entities.length; i++) {
                 let m = entities[i]; m.x += m.vx; m.y += m.vy; m.vx *= 0.98; m.vy *= 0.98;
 
-                // Walls (Ceiling at 80px to avoid Header)
-                if (m.x < m.r || m.x > canvas.width - m.r) m.vx *= -0.9;
-                if (m.y < m.r + 80 || m.y > canvas.height - m.r) m.vy *= -0.9;
+                // Walls
+                if (m.x < m.r || m.x > canvas.width - m.r) { m.vx *= -0.9; playSFX('clack'); }
+                if (m.y < m.r + 80 || m.y > canvas.height - m.r) { m.vy *= -0.9; playSFX('clack'); }
 
                 if (m.x < m.r) m.x = m.r; if (m.x > canvas.width - m.r) m.x = canvas.width - m.r;
                 if (m.y < m.r + 80) m.y = m.r + 80; if (m.y > canvas.height - m.r) m.y = canvas.height - m.r;
@@ -940,6 +1011,7 @@
                     if (d < minD) {
                         let a = Math.atan2(dy, dx), tx = m.x + Math.cos(a) * minD, ty = m.y + Math.sin(a) * minD;
                         let ax = (tx - m2.x) * 0.05, ay = (ty - m2.y) * 0.05; m.vx -= ax; m.vy -= ay; m2.vx += ax; m2.vy += ay;
+                        playSFX('clack');
                     }
                 }
                 ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2); ctx.fillStyle = m.c; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.lineWidth = 2; ctx.stroke();
@@ -963,7 +1035,12 @@
             navBar.style.display = 'flex';
             setTimeout(() => navBar.style.opacity = 1, 100);
             resize();
-            switchView('particles'); // Default Start
+
+            // RANDOM START
+            const games = ['particles', 'sorting', 'bubbles', 'liquid', 'marbles'];
+            const randomGame = games[Math.floor(Math.random() * games.length)];
+            switchView(randomGame);
+
             isSessionRunning = true;
             initAudio();
             animate();
