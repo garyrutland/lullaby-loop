@@ -37,7 +37,7 @@
 
         /* Sunset Overlay */
         #sunset-overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -51,7 +51,6 @@
 
         /* --- NAVIGATION BAR --- */
         #nav-bar {
-            /* Changed to FIXED to prevent scrolling off-screen */
             position: fixed;
             bottom: 30px;
             left: 0;
@@ -59,11 +58,9 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            z-index: 2000;
-            /* Increased Z-Index */
+            z-index: 3000;
             padding-bottom: env(safe-area-inset-bottom);
             pointer-events: auto;
-            /* Ensure clicks register */
         }
 
         .nav-btn {
@@ -78,7 +75,7 @@
             transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(8px);
-            /* Disable game touch actions on buttons */
+            -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
 
@@ -102,23 +99,20 @@
         }
 
         /* --- VIEWS --- */
-        .view {
-            position: absolute;
+        #view-container {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: none;
-        }
-
-        .view.active {
-            display: block;
+            z-index: 100;
         }
 
         canvas {
             display: block;
             width: 100%;
             height: 100%;
+            touch-action: none;
         }
 
         /* --- HEADER --- */
@@ -128,7 +122,7 @@
             left: 0;
             width: 100%;
             height: 80px;
-            z-index: 2000;
+            z-index: 3000;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -157,7 +151,7 @@
             border: 1px solid #333;
             border-radius: 12px;
             padding: 25px;
-            z-index: 3000;
+            z-index: 4000;
             display: none;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
         }
@@ -269,7 +263,7 @@
             width: 100%;
             height: 100%;
             background: #050505;
-            z-index: 2500;
+            z-index: 5000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -406,7 +400,7 @@
             <button class="action-btn quit-btn" onclick="showQuitConfirm()">End Session</button>
         </div>
 
-        <div id="confirm-modal" class="modal-overlay" style="z-index: 2500;">
+        <div id="confirm-modal" class="modal-overlay" style="z-index: 4500;">
             <h2>End Session?</h2>
             <p>This will stop the audio and return to the Start Screen.</p>
             <div style="display:flex; gap:10px; margin-top:20px;">
@@ -417,7 +411,7 @@
             </div>
         </div>
 
-        <div id="update-modal" class="modal-overlay" style="z-index: 2600;">
+        <div id="update-modal" class="modal-overlay" style="z-index: 4600;">
             <h2>Check for Updates?</h2>
             <p style="color: #e67e22;"><strong>Internet Connection Required</strong></p>
             <p>This will reload the app from the server to check for the latest version. Any current settings will be
@@ -487,30 +481,31 @@
         </div>
 
         <div id="nav-bar" style="display:none; opacity: 0; transition: opacity 2s;">
-            <div class="nav-btn active" onclick="switchView('particles')" ontouchstart="switchView('particles')">
+            <div class="nav-btn active" id="btn-particles" onclick="switchView('particles')"
+                ontouchstart="switchView('particles')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
                 </svg>
             </div>
-            <div class="nav-btn" onclick="switchView('sorting')" ontouchstart="switchView('sorting')">
+            <div class="nav-btn" id="btn-sorting" onclick="switchView('sorting')" ontouchstart="switchView('sorting')">
                 <svg viewBox="0 0 24 24">
                     <path d="M3 3H11V11H3V3ZM13 3H21V11H13V3ZM3 13H11V21H3V13ZM13 13H21V21H13V13Z" />
                 </svg>
             </div>
-            <div class="nav-btn" onclick="switchView('bubbles')" ontouchstart="switchView('bubbles')">
+            <div class="nav-btn" id="btn-bubbles" onclick="switchView('bubbles')" ontouchstart="switchView('bubbles')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" />
                 </svg>
             </div>
-            <div class="nav-btn" onclick="switchView('liquid')" ontouchstart="switchView('liquid')">
+            <div class="nav-btn" id="btn-liquid" onclick="switchView('liquid')" ontouchstart="switchView('liquid')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12,2c-5.33,4.55-8,8.48-8,11.8c0,4.98,3.8,8.2,8,8.2s8-3.22,8-8.2C20,10.48,17.33,6.55,12,2z M12,20c-3.35,0-6-2.57-6-6.2c0-2.34,1.95-5.44,6-9.14c4.05,3.7,6,6.79,6,9.14C18,17.43,15.35,20,12,20z" />
                 </svg>
             </div>
-            <div class="nav-btn" onclick="switchView('marbles')" ontouchstart="switchView('marbles')">
+            <div class="nav-btn" id="btn-marbles" onclick="switchView('marbles')" ontouchstart="switchView('marbles')">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-5 10c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm10 0c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm-5 7c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
@@ -518,11 +513,9 @@
             </div>
         </div>
 
-        <div id="view-particles" class="view active"><canvas id="canvas-particles"></canvas></div>
-        <div id="view-sorting" class="view"><canvas id="canvas-sorting"></canvas></div>
-        <div id="view-bubbles" class="view"><canvas id="canvas-bubbles"></canvas></div>
-        <div id="view-liquid" class="view"><canvas id="canvas-liquid"></canvas></div>
-        <div id="view-marbles" class="view"><canvas id="canvas-marbles"></canvas></div>
+        <div id="view-container">
+            <canvas id="main-canvas"></canvas>
+        </div>
     </div>
 
     <script>
@@ -537,11 +530,18 @@
         let isSessionRunning = false;
         let currentView = 'particles';
 
+        // --- DOM ---
         const titleEl = document.getElementById('app-title');
         const modal = document.getElementById('settings-modal');
         const confirmModal = document.getElementById('confirm-modal');
         const timerDisplay = document.getElementById('timer-display');
         const pauseBtn = document.getElementById('pause-btn');
+        const navBar = document.getElementById('nav-bar');
+        const canvas = document.getElementById('main-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let entities = [];
+        let lastInteraction = Date.now();
 
         // --- PARENT MENU LOGIC ---
         let tapCount = 0;
@@ -602,32 +602,20 @@
 
         function closeSettings() { modal.style.display = 'none'; }
 
-        function showQuitConfirm() {
-            modal.style.display = 'none';
-            confirmModal.style.display = 'block';
-        }
-
-        function closeQuitConfirm() {
-            confirmModal.style.display = 'none';
-            modal.style.display = 'block';
-        }
-
+        function showQuitConfirm() { modal.style.display = 'none'; confirmModal.style.display = 'block'; }
+        function closeQuitConfirm() { confirmModal.style.display = 'none'; modal.style.display = 'block'; }
         function resetApp() {
             confirmModal.style.display = 'none';
             if (audioCtx) audioCtx.suspend();
             if (noiseSource) try { noiseSource.stop() } catch (e) { }
             clearInterval(timerInterval);
-            isSessionRunning = false;
-            isPaused = false;
-            elapsedSaved = 0;
+            isSessionRunning = false; isPaused = false; elapsedSaved = 0;
             document.getElementById('sunset-overlay').style.opacity = 0;
-            document.getElementById('nav-bar').style.display = 'none';
-            document.getElementById('nav-bar').style.opacity = 0;
+            navBar.style.display = 'none'; navBar.style.opacity = 0;
             document.getElementById('start-screen').style.display = 'flex';
             pauseBtn.innerText = "Pause Session";
             pauseBtn.className = "action-btn pause-btn";
         }
-
         function performUpdate() { window.location.reload(); }
 
         // --- AUDIO ENGINE ---
@@ -636,7 +624,6 @@
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
-
             if (!gainNode) { gainNode = audioCtx.createGain(); gainNode.connect(audioCtx.destination); }
             generateSoundBuffer(currentSound);
         }
@@ -717,40 +704,25 @@
             if (timerInterval) clearInterval(timerInterval);
             if (reset) { startTime = Date.now(); elapsedSaved = 0; }
             updateTimerText();
-
-            timerInterval = setInterval(() => {
-                updateTimerText();
-                checkSunset();
-            }, 1000);
+            timerInterval = setInterval(() => { updateTimerText(); checkSunset(); }, 1000);
         }
-
-        function getCurrentElapsed() {
-            return Math.floor((Date.now() - startTime) + elapsedSaved) / 1000;
-        }
-
+        function getCurrentElapsed() { return Math.floor((Date.now() - startTime) + elapsedSaved) / 1000; }
         function updateTimerText() {
             if (!isSessionRunning) return;
             const totalSeconds = sessionMinutes * 60;
             const currentSessionElapsed = isPaused ? (elapsedSaved / 1000) : getCurrentElapsed();
-
             let remaining = totalSeconds - currentSessionElapsed;
             if (remaining < 0) remaining = 0;
-
             let rMin = Math.floor(remaining / 60);
             let rSec = Math.floor(remaining % 60);
-
-            let text = `Time Left: ${rMin}m ${rSec < 10 ? '0' : ''}${rSec}s`;
-            if (isPaused) text += " (PAUSED)";
-            timerDisplay.innerText = text;
+            timerDisplay.innerText = `Time Left: ${rMin}m ${rSec < 10 ? '0' : ''}${rSec}s` + (isPaused ? " (PAUSED)" : "");
         }
-
         function checkSunset() {
             if (isPaused) return;
             const totalSeconds = sessionMinutes * 60;
             const elapsed = getCurrentElapsed();
             let progress = elapsed / totalSeconds;
             if (progress > 1) progress = 1;
-
             if (progress > 0.5) {
                 const fade = (progress - 0.5) * 2;
                 document.getElementById('sunset-overlay').style.opacity = fade * 0.98;
@@ -761,291 +733,198 @@
         // --- VIEW MANAGEMENT ---
         function switchView(viewName) {
             currentView = viewName;
-            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + viewName).classList.add('active');
+            const btn = document.getElementById(`btn-${viewName}`);
+            if (btn) btn.classList.add('active');
 
-            const indices = { 'particles': 0, 'sorting': 1, 'bubbles': 2, 'liquid': 3, 'marbles': 4 };
-            if (indices[viewName] !== undefined) {
-                document.querySelectorAll('.nav-btn')[indices[viewName]].classList.add('active');
-            }
+            entities = []; // Reset game state
+            if (viewName === 'sorting') initSorting();
+            if (viewName === 'bubbles') initBubbles();
+            if (viewName === 'marbles') initMarbles();
         }
 
         // --- INPUT HANDLING ---
         function pulse(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
-        window.addEventListener('resize', () => { resizeP(); resizeS(); resizeB(); resizeL(); resizeM(); });
-        ['mousedown', 'touchstart'].forEach(evt => window.addEventListener(evt, e => {
-            // FIX: Ignore UI elements
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+
+        function handleInput(e, type) {
             if (e.target.closest('.nav-btn') || e.target.closest('#header-area') || e.target.closest('.modal-overlay')) return;
 
-            const x = e.touches ? e.touches[0].clientX : e.clientX;
-            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            e.preventDefault();
 
-            if (currentView === 'sorting') handleSStart(x, y);
-            if (currentView === 'bubbles') handleBStart(x, y);
-            if (currentView === 'liquid') handleLStart(x, y);
-            if (currentView === 'marbles') handleMInput(x, y);
-        }, { passive: false }));
+            const t = e.touches ? e.touches[0] : e;
+            const x = t.clientX; const y = t.clientY;
 
-        ['mousemove', 'touchmove'].forEach(evt => window.addEventListener(evt, e => {
-            if (e.target.closest('.nav-btn') || e.target.closest('#header-area') || e.target.closest('.modal-overlay')) return;
+            lastInteraction = Date.now();
 
-            const x = e.touches ? e.touches[0].clientX : e.clientX;
-            const y = e.touches ? e.touches[0].clientY : e.clientY;
-            if (currentView === 'particles') handlePMove(x, y);
-            if (currentView === 'sorting') handleSMove(x, y);
-            if (currentView === 'liquid') handleLMove(x, y);
-            if (currentView === 'marbles') handleMInput(x, y);
-        }, { passive: false }));
-
-        ['mouseup', 'touchend'].forEach(evt => window.addEventListener(evt, e => {
-            if (currentView === 'sorting') handleSEnd();
-            if (currentView === 'liquid') handleLEnd();
-        }));
-
-        // --- 1. PARTICLES (Auto-Sparkle) ---
-        const pc = document.getElementById('canvas-particles'); const pctx = pc.getContext('2d');
-        let parts = [];
-        function resizeP() { pc.width = window.innerWidth; pc.height = window.innerHeight; }
-        function handlePMove(x, y) { spawnParticle(x, y); }
-        function spawnParticle(x, y) {
-            parts.push({ x, y, vx: (Math.random() - .5) * 2, vy: (Math.random() - .5) * 2, life: 1, hue: Math.random() * 60 + 200 });
-        }
-        function animP() {
-            if (currentView !== 'particles') { requestAnimationFrame(animP); return; }
-            pctx.fillStyle = 'rgba(5,5,5,0.2)'; pctx.fillRect(0, 0, pc.width, pc.height);
-            // AUTO-SPAWN (Idle Fireflies)
-            if (Math.random() < 0.05) spawnParticle(Math.random() * pc.width, Math.random() * pc.height);
-            for (let i = 0; i < parts.length; i++) {
-                let p = parts[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.01;
-                if (p.life > 0) { pctx.beginPath(); pctx.arc(p.x, p.y, Math.random() * 15 + 5, 0, Math.PI * 2); pctx.fillStyle = `hsla(${p.hue},80%,60%,${p.life})`; pctx.fill(); }
-                else { parts.splice(i, 1); i--; }
+            if (type === 'start') {
+                if (currentView === 'particles') spawnParticle(x, y);
+                if (currentView === 'sorting') handleSStart(x, y);
+                if (currentView === 'bubbles') handleBStart(x, y);
+                if (currentView === 'liquid') spawnLiquid(x, y);
+                if (currentView === 'marbles') handleMInput(x, y);
+            } else if (type === 'move') {
+                if (currentView === 'particles') spawnParticle(x, y);
+                if (currentView === 'sorting') handleSMove(x, y);
+                if (currentView === 'liquid') spawnLiquid(x, y);
+                if (currentView === 'marbles') handleMInput(x, y);
             }
-            requestAnimationFrame(animP);
         }
 
-        // --- 2. SORTING (Floating & Ghost Hand) ---
-        const sc = document.getElementById('canvas-sorting'); const sctx = sc.getContext('2d');
-        let stones = [], dragS = null, offX = 0, offY = 0;
-        let lastInteractionTime = Date.now();
-        function resizeS() { sc.width = window.innerWidth; sc.height = window.innerHeight; if (!stones.length) initS(); }
-        function initS() {
+        canvas.addEventListener('mousedown', e => handleInput(e, 'start'));
+        canvas.addEventListener('touchstart', e => handleInput(e, 'start'), { passive: false });
+        canvas.addEventListener('mousemove', e => handleInput(e, 'move'));
+        canvas.addEventListener('touchmove', e => handleInput(e, 'move'), { passive: false });
+        canvas.addEventListener('mouseup', () => { if (currentView === 'sorting') handleSEnd(); });
+        canvas.addEventListener('touchend', () => { if (currentView === 'sorting') handleSEnd(); });
+
+        // --- GAME LOGIC ---
+
+        // 1. PARTICLES
+        function spawnParticle(x, y) { entities.push({ x, y, vx: (Math.random() - .5) * 2, vy: (Math.random() - .5) * 2, life: 1, hue: Math.random() * 60 + 200 }); }
+        function animParticles() {
+            ctx.fillStyle = 'rgba(5,5,5,0.2)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (Math.random() < 0.05) spawnParticle(Math.random() * canvas.width, Math.random() * canvas.height);
+            for (let i = 0; i < entities.length; i++) {
+                let p = entities[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.01;
+                if (p.life > 0) { ctx.beginPath(); ctx.arc(p.x, p.y, Math.random() * 15 + 5, 0, Math.PI * 2); ctx.fillStyle = `hsla(${p.hue},80%,60%,${p.life})`; ctx.fill(); }
+                else { entities.splice(i, 1); i--; }
+            }
+        }
+
+        // 2. SORTING (Safe Zones Added)
+        let dragS = null, offX = 0, offY = 0;
+        function initSorting() {
             const cols = ['#5D6D7E', '#A9DFBF', '#F5B7B1', '#D7BDE2', '#F9E79F'];
-            const count = Math.min(Math.max(Math.floor((sc.width * sc.height) / 35000), 10), 30);
-            for (let i = 0; i < count; i++) spawnStone(cols);
-        }
-        function spawnStone(cols) {
-            stones.push({
-                x: Math.random() * (sc.width - 100) + 50, y: Math.random() * (sc.height - 200) + 50,
-                w: Math.random() * 60 + 40, h: Math.random() * 40 + 30,
-                c: cols[Math.floor(Math.random() * cols.length)],
-                dx: Math.random() * 100, dy: Math.random() * 100, scale: 1.0,
-                targetX: null, targetY: null
-            });
-        }
-        function animS() {
-            if (currentView !== 'sorting') { requestAnimationFrame(animS); return; }
-            sctx.clearRect(0, 0, sc.width, sc.height);
-            if (Date.now() - lastInteractionTime > 2000 && !dragS) {
-                if (Math.random() < 0.02) {
-                    let s = stones[Math.floor(Math.random() * stones.length)];
-                    s.targetX = Math.random() * (sc.width - 100) + 50; s.targetY = Math.random() * (sc.height - 200) + 50;
-                    lastInteractionTime = Date.now();
-                }
-            }
-            stones.forEach(s => {
-                if (s.targetX !== null) {
-                    s.x += (s.targetX - s.x) * 0.05; s.y += (s.targetY - s.y) * 0.05;
-                    if (Math.abs(s.x - s.targetX) < 5) s.targetX = null;
-                }
-                let floatX = s.x + Math.sin(Date.now() * 0.001 + s.dx) * 2;
-                let floatY = s.y + Math.cos(Date.now() * 0.001 + s.dy) * 2;
-                if (dragS === s) { floatX = s.x; floatY = s.y; s.scale += (1.2 - s.scale) * 0.2; } else { s.scale += (1.0 - s.scale) * 0.2; }
-                let dw = s.w * s.scale; let dh = s.h * s.scale;
-                sctx.fillStyle = 'rgba(0,0,0,0.5)'; sctx.beginPath(); sctx.roundRect(floatX - dw / 2 + 4, floatY - dh / 2 + 4, dw, dh, 15); sctx.fill();
-                sctx.fillStyle = s.c; sctx.beginPath(); sctx.roundRect(floatX - dw / 2, floatY - dh / 2, dw, dh, 15); sctx.fill();
-                sctx.fillStyle = 'rgba(255,255,255,0.2)'; sctx.beginPath(); sctx.roundRect(floatX - dw / 2 + 5, floatY - dh / 2 + 2, dw - 10, dh / 2, 10); sctx.fill();
-            });
-            requestAnimationFrame(animS);
+            for (let i = 0; i < 15; i++) entities.push({ x: Math.random() * (canvas.width - 100) + 50, y: Math.random() * (canvas.height - 200) + 100, w: Math.random() * 60 + 40, h: Math.random() * 40 + 30, c: cols[Math.floor(Math.random() * cols.length)], dx: Math.random() * 100, dy: Math.random() * 100, scale: 1.0, targetX: null, targetY: null });
         }
         function handleSStart(x, y) {
-            lastInteractionTime = Date.now();
-            for (let i = stones.length - 1; i >= 0; i--) {
-                let s = stones[i];
+            for (let i = entities.length - 1; i >= 0; i--) {
+                let s = entities[i];
                 if (x > s.x - s.w / 2 - 20 && x < s.x + s.w / 2 + 20 && y > s.y - s.h / 2 - 20 && y < s.y + s.h / 2 + 20) {
-                    dragS = s; offX = x - s.x; offY = y - s.y; stones.splice(i, 1); stones.push(dragS); s.targetX = null; pulse(10); break;
+                    dragS = s; offX = x - s.x; offY = y - s.y; entities.splice(i, 1); entities.push(dragS); s.targetX = null; pulse(10); break;
                 }
             }
         }
-        function handleSMove(x, y) { if (dragS) { lastInteractionTime = Date.now(); dragS.x = x - offX; dragS.y = y - offY; } }
-        function handleSEnd() { if (dragS) pulse(10); dragS = null; }
+        function handleSMove(x, y) { if (dragS) { dragS.x = x - offX; dragS.y = y - offY; } }
+        function handleSEnd() { dragS = null; }
+        function animSorting() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (Date.now() - lastInteraction > 2000 && !dragS && Math.random() < 0.02) {
+                let s = entities[Math.floor(Math.random() * entities.length)]; s.targetX = Math.random() * (canvas.width - 100) + 50; s.targetY = Math.random() * (canvas.height - 200) + 50; lastInteraction = Date.now();
+            }
+            entities.forEach(s => {
+                if (s.targetX !== null) { s.x += (s.targetX - s.x) * 0.05; s.y += (s.targetY - s.y) * 0.05; if (Math.abs(s.x - s.targetX) < 5) s.targetX = null; }
 
-        // --- 3. BUBBLES ---
-        const bc = document.getElementById('canvas-bubbles'); const bctx = bc.getContext('2d');
-        let bubbles = []; let popParticles = []; let maxBubbles = 35;
-        function resizeB() {
-            bc.width = window.innerWidth; bc.height = window.innerHeight;
-            bubbles = []; popParticles = [];
-            maxBubbles = Math.min(80, Math.max(25, Math.floor((bc.width * bc.height) / 8000)));
+                // Repel from Header & Footer
+                if (s.y < 100 && dragS !== s) { s.y += 1; }
+                if (s.y > canvas.height - 100 && dragS !== s) { s.y -= 1; }
+
+                let fx = s.x + Math.sin(Date.now() * 0.001 + s.dx) * 2, fy = s.y + Math.cos(Date.now() * 0.001 + s.dy) * 2;
+                if (dragS === s) { fx = s.x; fy = s.y; s.scale += (1.2 - s.scale) * 0.2; } else { s.scale += (1.0 - s.scale) * 0.2; }
+                let dw = s.w * s.scale, dh = s.h * s.scale;
+                ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.roundRect(fx - dw / 2 + 4, fy - dh / 2 + 4, dw, dh, 15); ctx.fill();
+                ctx.fillStyle = s.c; ctx.beginPath(); ctx.roundRect(fx - dw / 2, fy - dh / 2, dw, dh, 15); ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.beginPath(); ctx.roundRect(fx - dw / 2 + 5, fy - dh / 2 + 2, dw - 10, dh / 2, 10); ctx.fill();
+            });
         }
-        function spawnBubble(forceRandomY = false) {
-            bubbles.push({ x: Math.random() * bc.width, y: forceRandomY ? Math.random() * bc.height : bc.height + 50, size: Math.random() * 40 + 15, speed: Math.random() * 1.5 + 0.5, wobble: Math.random() * Math.PI * 2, color: `hsla(${Math.random() * 40 + 180}, 70%, 70%, 0.3)` });
+
+        // 3. BUBBLES
+        function initBubbles() {
+            let maxB = Math.min(80, Math.max(25, Math.floor((canvas.width * canvas.height) / 8000)));
+            for (let i = 0; i < maxB / 2; i++) spawnBubble();
         }
-        function createPop(x, y, color) {
-            let count = 8 + Math.random() * 4;
-            for (let i = 0; i < count; i++) {
-                let angle = (Math.PI * 2 * i) / count; let speed = 2 + Math.random() * 3;
-                popParticles.push({ x: x, y: y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1.0, color: color.replace('0.3', '0.8'), size: Math.random() * 3 + 2 });
-            }
-            popParticles.push({ x: x, y: y, size: 10, type: 'ring', life: 1.0, color: 'rgba(255,255,255,0.5)' });
-        }
-        function animB() {
-            if (currentView !== 'bubbles') { requestAnimationFrame(animB); return; }
-            bctx.clearRect(0, 0, bc.width, bc.height);
-            if (bubbles.length < maxBubbles && Math.random() < 0.1) spawnBubble();
-            if (bubbles.length === 0) for (let i = 0; i < maxBubbles / 2; i++) spawnBubble(true);
-            for (let i = 0; i < bubbles.length; i++) {
-                let b = bubbles[i]; b.y -= b.speed; b.x += Math.sin(b.y * 0.01 + b.wobble) * 0.5;
-                bctx.beginPath(); bctx.arc(b.x, b.y, b.size, 0, Math.PI * 2); bctx.fillStyle = b.color; bctx.fill(); bctx.strokeStyle = "rgba(255,255,255,0.4)"; bctx.lineWidth = 2; bctx.stroke();
-                if (b.y < -60) { bubbles.splice(i, 1); i--; }
-            }
-            for (let i = 0; i < popParticles.length; i++) {
-                let p = popParticles[i]; p.life -= 0.04;
-                if (p.life <= 0) { popParticles.splice(i, 1); i--; continue; }
-                if (p.type === 'ring') { p.size += 3; bctx.beginPath(); bctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); bctx.strokeStyle = `rgba(255,255,255,${p.life * 0.5})`; bctx.lineWidth = 2; bctx.stroke(); }
-                else { p.x += p.vx; p.y += p.vy; bctx.beginPath(); bctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); bctx.fillStyle = p.color; bctx.globalAlpha = p.life; bctx.fill(); bctx.globalAlpha = 1.0; }
-            }
-            requestAnimationFrame(animB);
-        }
+        function spawnBubble() { entities.push({ type: 'b', x: Math.random() * canvas.width, y: canvas.height + 50, s: Math.random() * 40 + 15, sp: Math.random() * 1.5 + 0.5, w: Math.random() * Math.PI * 2, c: `hsla(${Math.random() * 40 + 180},70%,70%,0.3)` }); }
         function handleBStart(x, y) {
-            for (let i = bubbles.length - 1; i >= 0; i--) {
-                let b = bubbles[i];
-                if (Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2) < b.size + 20) { createPop(b.x, b.y, b.color); bubbles.splice(i, 1); pulse(10); playPopSound(); break; }
+            for (let i = entities.length - 1; i >= 0; i--) {
+                let b = entities[i];
+                if (b.type === 'b' && Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2) < b.s + 20) { createPop(b.x, b.y, b.c); entities.splice(i, 1); pulse(10); playPopSound(); break; }
             }
         }
-
-        // --- 4. LIQUID LIGHT (New Game 4) ---
-        const lc = document.getElementById('canvas-liquid'); const lctx = lc.getContext('2d');
-        let isLiquidDraw = false;
-
-        function resizeL() { lc.width = window.innerWidth; lc.height = window.innerHeight; }
-
-        function handleLStart(x, y) { isLiquidDraw = true; spawnLiquid(x, y); }
-        function handleLMove(x, y) { if (isLiquidDraw) spawnLiquid(x, y); }
-        function handleLEnd() { isLiquidDraw = false; }
-
-        function spawnLiquid(x, y) {
-            lctx.beginPath();
-            lctx.arc(x, y, 30, 0, Math.PI * 2);
-            lctx.fillStyle = `hsl(${Date.now() % 360}, 70%, 60%)`;
-            lctx.shadowBlur = 40;
-            lctx.shadowColor = lctx.fillStyle;
-            lctx.fill();
-            lctx.shadowBlur = 0;
-        }
-
-        function animL() {
-            if (currentView !== 'liquid') { requestAnimationFrame(animL); return; }
-            lctx.fillStyle = 'rgba(5, 5, 5, 0.08)';
-            lctx.fillRect(0, 0, lc.width, lc.height);
-
-            let time = Date.now() * 0.002;
-            let gx = lc.width / 2 + Math.sin(time) * (lc.width / 3);
-            let gy = lc.height / 2 + Math.cos(time * 1.3) * (lc.height / 4);
-            lctx.beginPath();
-            lctx.arc(gx, gy, 15, 0, Math.PI * 2);
-            lctx.fillStyle = `hsla(${(Date.now() / 10) % 360}, 60%, 50%, 0.3)`;
-            lctx.shadowBlur = 20;
-            lctx.shadowColor = lctx.fillStyle;
-            lctx.fill();
-            lctx.shadowBlur = 0;
-
-            requestAnimationFrame(animL);
-        }
-
-        // --- 5. COSMIC MARBLES (Updated) ---
-        const mc = document.getElementById('canvas-marbles'); const mx = mc.getContext('2d');
-        let marbles = [];
-
-        function resizeM() {
-            mc.width = window.innerWidth; mc.height = window.innerHeight;
-            if (marbles.length === 0) initM();
-        }
-
-        function initM() {
-            marbles = [];
-            const area = mc.width * mc.height;
-            const count = Math.min(50, Math.max(15, Math.floor(area / 15000)));
-
-            for (let i = 0; i < count; i++) {
-                marbles.push({
-                    x: Math.random() * mc.width, y: Math.random() * mc.height,
-                    vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2,
-                    radius: Math.random() * 15 + 15, color: `hsl(${Math.random() * 360}, 60%, 60%)`
-                });
-            }
-        }
-
-        function handleMInput(x, y) {
-            for (let i = 0; i < marbles.length; i++) {
-                let m = marbles[i];
-                let dx = m.x - x;
-                let dy = m.y - y;
-                let dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < 150) {
-                    let force = (150 - dist) / 150;
-                    let angle = Math.atan2(dy, dx);
-                    m.vx += Math.cos(angle) * force * 1.5;
-                    m.vy += Math.sin(angle) * force * 1.5;
+        function createPop(x, y, c) { for (let i = 0; i < 8; i++) entities.push({ type: 'p', x, y, vx: Math.cos(Math.PI * 2 * i / 8) * 3, vy: Math.sin(Math.PI * 2 * i / 8) * 3, l: 1, c: c.replace('0.3', '0.8') }); }
+        function animBubbles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (Math.random() < 0.05) spawnBubble();
+            for (let i = 0; i < entities.length; i++) {
+                let e = entities[i];
+                if (e.type === 'b') {
+                    e.y -= e.sp; e.x += Math.sin(e.y * 0.01 + e.w) * 0.5;
+                    ctx.beginPath(); ctx.arc(e.x, e.y, e.s, 0, Math.PI * 2); ctx.fillStyle = e.c; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 2; ctx.stroke();
+                    if (e.y < -60) { entities.splice(i, 1); i--; }
+                } else {
+                    e.l -= 0.04; e.x += e.vx; e.y += e.vy;
+                    if (e.l <= 0) { entities.splice(i, 1); i--; continue; }
+                    ctx.beginPath(); ctx.arc(e.x, e.y, 3, 0, Math.PI * 2); ctx.fillStyle = e.c; ctx.globalAlpha = e.l; ctx.fill(); ctx.globalAlpha = 1;
                 }
             }
         }
 
-        function animM() {
-            if (currentView !== 'marbles') { requestAnimationFrame(animM); return; }
-            mx.clearRect(0, 0, mc.width, mc.height);
-            for (let i = 0; i < marbles.length; i++) {
-                let m = marbles[i];
-                m.x += m.vx; m.y += m.vy; m.vx *= 0.98; m.vy *= 0.98;
-                if (m.x < m.radius) { m.x = m.radius; m.vx *= -0.9; }
-                if (m.x > mc.width - m.radius) { m.x = mc.width - m.radius; m.vx *= -0.9; }
-                if (m.y < m.radius) { m.y = m.radius; m.vy *= -0.9; }
-                if (m.y > mc.height - m.radius) { m.y = mc.height - m.radius; m.vy *= -0.9; }
-                for (let j = i + 1; j < marbles.length; j++) {
-                    let m2 = marbles[j];
-                    let dx = m2.x - m.x; let dy = m2.y - m.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    let minDist = m.radius + m2.radius;
-                    if (dist < minDist) {
-                        let angle = Math.atan2(dy, dx);
-                        let tx = m.x + Math.cos(angle) * minDist;
-                        let ty = m.y + Math.sin(angle) * minDist;
-                        let ax = (tx - m2.x) * 0.05; let ay = (ty - m2.y) * 0.05;
-                        m.vx -= ax; m.vy -= ay; m2.vx += ax; m2.vy += ay;
+        // 4. LIQUID
+        function spawnLiquid(x, y) {
+            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI * 2); ctx.fillStyle = `hsl(${Date.now() % 360},70%,60%)`; ctx.shadowBlur = 40; ctx.shadowColor = ctx.fillStyle; ctx.fill(); ctx.shadowBlur = 0;
+        }
+        function animLiquid() {
+            ctx.fillStyle = 'rgba(5,5,5,0.08)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            let t = Date.now() * 0.002; spawnLiquid(canvas.width / 2 + Math.sin(t) * (canvas.width / 3), canvas.height / 2 + Math.cos(t * 1.3) * (canvas.height / 4));
+        }
+
+        // 5. MARBLES (Safe Zones Added)
+        function initMarbles() {
+            for (let i = 0; i < 15; i++) entities.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - .5) * 2, vy: (Math.random() - .5) * 2, r: Math.random() * 15 + 15, c: `hsl(${Math.random() * 360},60%,60%)` });
+        }
+        function handleMInput(x, y) {
+            entities.forEach(m => {
+                let dx = m.x - x, dy = m.y - y, d = Math.sqrt(dx * dx + dy * dy);
+                if (d < 200) { let f = (200 - d) / 200, a = Math.atan2(dy, dx); m.vx += Math.cos(a) * f * 2.5; m.vy += Math.sin(a) * f * 2.5; }
+            });
+        }
+        function animMarbles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < entities.length; i++) {
+                let m = entities[i]; m.x += m.vx; m.y += m.vy; m.vx *= 0.98; m.vy *= 0.98;
+
+                // Walls (Ceiling 80px, Floor 100px from bottom)
+                if (m.x < m.r || m.x > canvas.width - m.r) m.vx *= -0.9;
+                if (m.y < m.r + 80 || m.y > canvas.height - 100 - m.r) m.vy *= -0.9;
+
+                if (m.x < m.r) m.x = m.r; if (m.x > canvas.width - m.r) m.x = canvas.width - m.r;
+                if (m.y < m.r + 80) m.y = m.r + 80; if (m.y > canvas.height - 100 - m.r) m.y = canvas.height - 100 - m.r;
+
+                for (let j = i + 1; j < entities.length; j++) {
+                    let m2 = entities[j], dx = m2.x - m.x, dy = m2.y - m.y, d = Math.sqrt(dx * dx + dy * dy), minD = m.r + m2.r;
+                    if (d < minD) {
+                        let a = Math.atan2(dy, dx), tx = m.x + Math.cos(a) * minD, ty = m.y + Math.sin(a) * minD;
+                        let ax = (tx - m2.x) * 0.05, ay = (ty - m2.y) * 0.05; m.vx -= ax; m.vy -= ay; m2.vx += ax; m2.vy += ay;
                     }
                 }
-                mx.beginPath(); mx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
-                mx.fillStyle = m.color; mx.fill(); mx.strokeStyle = "rgba(255,255,255,0.2)"; mx.lineWidth = 2; mx.stroke();
+                ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2); ctx.fillStyle = m.c; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.lineWidth = 2; ctx.stroke();
             }
-            requestAnimationFrame(animM);
         }
 
-        // --- BOOT ---
+        // --- LOOP ---
+        function animate() {
+            if (isSessionRunning && !isPaused) {
+                if (currentView === 'particles') animParticles();
+                if (currentView === 'sorting') animSorting();
+                if (currentView === 'bubbles') animBubbles();
+                if (currentView === 'liquid') animLiquid();
+                if (currentView === 'marbles') animMarbles();
+            }
+            requestAnimationFrame(animate);
+        }
+
         document.getElementById('begin-btn').addEventListener('click', function () {
             document.getElementById('start-screen').style.display = 'none';
-            const nav = document.getElementById('nav-bar');
-            nav.style.display = 'flex';
-            setTimeout(() => nav.style.opacity = 1, 100);
-
+            navBar.style.display = 'flex';
+            setTimeout(() => navBar.style.opacity = 1, 100);
+            resize();
             const views = ['particles', 'sorting', 'bubbles', 'liquid', 'marbles'];
             const randomStart = views[Math.floor(Math.random() * views.length)];
             switchView(randomStart);
             isSessionRunning = true;
-
-            resizeP(); resizeS(); resizeB(); resizeL(); resizeM();
             initAudio();
-            animP(); animS(); animB(); animL(); animM();
+            animate();
             startTimer(true);
         });
     </script>
